@@ -1,0 +1,21 @@
+﻿@model RegisterAndLogin6.Models.User
+<h2>Login</h2>
+<hr />
+<form class="form-horizontal" method="post" asp-controller="Account" asp-action="Register">
+    <div class="form-group">
+        <label>ID</label>
+        <input type="text" class="form-control" asp-for="UserId" placeholder="ID" />
+    </div>
+    <div class="form-group">
+        <label>비밀번호</label>
+        <input type="password" class="form-control" asp-for="UserPassword" placeholder="비밀번호" />
+    </div>
+    <div class="form-group">
+        <label>이름</label>
+        <input type="text" class="form-control" asp-for="UserName" placeholder="이름" />
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">회원가입</button>
+        <a class="btn btn-default" href="#">취소</a>
+    </div>
+</form>
