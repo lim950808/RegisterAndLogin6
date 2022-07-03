@@ -12,45 +12,43 @@ using RegistrationAndLogin6.Models;
 namespace RegisterAndLogin6.Controllers
 {
     public class AccountController : Controller
-    {
-        // GET: Login
-        public ActionResult Register()
-        {
-            return View();
-        }
-
-        [HttpPost]
+    {    
         public ActionResult Register(Account account)
         {
-            /*using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["SqlConnection"].ConnectionString))
+            try
             {
-                string sqlQuery = "INSERT INTO Account (Username, UserId, UserPassword) VALUES(" + account.Name + "," + account.Email + "," + account.Password + ")";
-                int insert = db.Execute(sqlQuery);
-            }*/
-            using (var connection = new SqlConnection(ConfigurationManager.ConnectionStrings["SqlConnection"].ConnectionString))
-            {
-                string str_query = "INSERT INTO Account(Id, Name, Email, Password) VALUES (@Id, @Name, @Email, @Password)";
-                connection.Execute(str_query, account);
+                if (ModelState.IsValid)
+                {
+                    using (var connection = new SqlConnection(ConfigurationManager.ConnectionStrings["SqlConnection"].ConnectionString))
+                    {
+                        string registerQuery = "INSERT INTO dbo.Account (Name, Email, Password) VALUES (@Name, @Email, @Password)";
+                        var result = connection.Execute(registerQuery, account);
+
+                        return RedirectToAction("Index");
+                    }
+
+                }
             }
-
-            return View("Login");
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "회원가입 불가");
+            }
+            return View(account);
         }
 
-        public ActionResult Login()
-        {
-            return View();
-        }
-
-        [HttpPost]
         public ActionResult Login(Account account)
         {
             if (ModelState.IsValid)
             {
                 /*using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["SqlConnection"].ConnectionString))
                 {
-                    var user = db.User.FirstOrDefault(u => )
+                    var user = db.account.FirstOrDefault(u => )
                 }*/
                 return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+
             }
 
             return View();

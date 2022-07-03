@@ -6,7 +6,7 @@
     <hr />
 
     <script>
-        function LoginValidation() {
+        @*function LoginValidation() {
             // Email 공백 확인
             if ($("#Email").val() == "") {
                 alert("Email을 입력하세요.");
@@ -20,7 +20,11 @@
                 return false;
             }
             return false;
-        };
+        };*@
+
+        $(document).ready(function () {
+            $("#login").click(function () {
+
     </script>
 
 </head>
