@@ -7,7 +7,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Dapper;
-using RegisterAndLogin6.Models;
+using RegistrationAndLogin6.Models;
 
 namespace RegisterAndLogin6.Controllers
 {
@@ -20,12 +20,17 @@ namespace RegisterAndLogin6.Controllers
         }
 
         [HttpPost]
-        public ActionResult Register(User user)
+        public ActionResult Register(Account account)
         {
-            using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["SqlConnection"].ConnectionString))
+            /*using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["SqlConnection"].ConnectionString))
             {
-                string sqlQuery = "INSERT INTO User (Username, UserId, UserPassword) VALUES(" + user.UserName + "," + user.UserId + "," + user.UserPassword + ")";
+                string sqlQuery = "INSERT INTO Account (Username, UserId, UserPassword) VALUES(" + account.Name + "," + account.Email + "," + account.Password + ")";
                 int insert = db.Execute(sqlQuery);
+            }*/
+            using (var connection = new SqlConnection(ConfigurationManager.ConnectionStrings["SqlConnection"].ConnectionString))
+            {
+                string str_query = "INSERT INTO Account(Id, Name, Email, Password) VALUES (@Id, @Name, @Email, @Password)";
+                connection.Execute(str_query, account);
             }
 
             return View("Login");
@@ -37,14 +42,14 @@ namespace RegisterAndLogin6.Controllers
         }
 
         [HttpPost]
-        public ActionResult Login(User user)
+        public ActionResult Login(Account account)
         {
             if (ModelState.IsValid)
             {
-                using (var db = new SqlConnection())
+                /*using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["SqlConnection"].ConnectionString))
                 {
-                    
-                }
+                    var user = db.User.FirstOrDefault(u => )
+                }*/
                 return RedirectToAction("Index", "Home");
             }
 

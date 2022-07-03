@@ -1,21 +1,167 @@
-﻿@model RegisterAndLogin6.Models.User
-<h2>Register</h2>
-<hr />
-<form class="form-horizontal" method="post">
-    <div class="form-group">
-        <label>ID</label>
-        <input type="text" class="form-control"  placeholder="ID" />
-    </div>
-    <div class="form-group">
-        <label>이름</label>
-        <input type="text" class="form-control" placeholder="이름" />
-    </div>
-    <div class="form-group">
-        <label>비밀번호</label>
-        <input type="password" class="form-control" placeholder="비밀번호" />
-    </div>
-    <div class="form-group">
-        <button type="submit" class="btn btn-primary">회원가입</button>
-        <a class="btn btn-default" href="#">취소</a>
-    </div>
-</form>
+﻿<html>
+<head>
+    <h2>회원가입</h2>
+    <script src="~/Scripts/jquery-3.6.0.min.js"></script>
+    <hr />
+
+    @*<form class="form-horizontal" name="RegistrationForm" id="RegistrationForm" method="post">
+            <div class="form-group">
+                <label>이름</label>
+                <input type="text" class="form-control" id="Name" placeholder="이름" />
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="text" class="form-control" id="Email" placeholder="예) example@srook.net" />
+            </div>
+            <div class="form-group">
+                <label>비밀번호</label>
+                <input type="password" class="form-control" id="Password" placeholder="비밀번호" />
+            </div>
+            <div class="form-group">
+                <label>비밀번호 확인</label>
+                <input type="password" class="form-control" id="PasswordConfirm" placeholder="비밀번호 확인" />
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">회원가입</button>
+                <a class="btn btn-default" href="javascript:window.history.back();">취소</a>
+            </div>
+        </form>*@
+
+
+<script>
+        @*$(document).ready(function () {
+            $("#RegistrationForm").submit(function () {
+                // 이름 공백 확인
+                if ($("#Name").val() == "") {
+                    alert("이름을 입력하세요.");
+                    $("#Name").focus();
+                    return false;
+                }
+                // Email 공백 확인
+                if ($("#Email").val() == "") {
+                    alert("Email을 입력하세요.");
+                    $("#Email").focus();
+                    return false;
+                }
+                // Email 정규식 체크
+                if (!regEmail.test($("#Email").val())) {
+                    alert("Email 형식에 맞게 입력해주세요.");
+                    $("#Email").val();
+                    $("#Email").focus();
+                    return false;
+                }
+                // 비밀번호 공백 확인
+                if ($("#Password").val() == "") {
+                    alert("비밀번호를 입력하세요.");
+                    $("#Password").focus();
+                    return false;
+                }
+                // 비밀번호 정규식 체크
+                if (!regPassword.test($("#Password").val())) {
+                    alert("비빌번호는 최소 8자(대소문자, 숫자, 특수기호 최소 각각 1자)가 필요합니다.");
+                    $("#Password").val("");
+                    $("#Password").focus();
+                    return false;
+                }
+                // 비밀번호 확인 공백 확인
+                if ($("#PasswordConfirm").val() == "") {
+                    alert("비밀번호를 한번 더 입력하세요.");
+                    $("#PasswordConfirm").focus();
+                    return false;
+                }
+                // 비밀번호 일치 여부
+                var Password = $("#Password").val();
+                var PasswordConfirm = $("#PasswordConfirm").val();
+                if (Password != PasswordConfirm) {
+                    alert("비밀번호가 일치하지 않습니다.");
+                    $("#PasswordConfirm").focus();
+                    return false;
+                }
+                return false;
+            });
+        });*@
+        function RegisterValidation() {
+            // 정규식
+            var regEmail = RegExp(/^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/);
+            var regPassword = RegExp(/^[a-zA-Z0-9]{8,}$/);
+
+            // "이름" 공백 확인
+            if ($("#Name").val() == "") {
+                alert("이름을 입력하세요.");
+                $("#Name").focus();
+                return false;
+            }
+            // "Email" 공백 확인
+            if ($("#Email").val() == "") {
+                alert("Email을 입력하세요.");
+                $("#Email").focus();
+                return false;
+            }
+            // "Email" 정규식 체크
+            if (!regEmail.test($("#Email").val())) {
+                alert("Email 형식에 맞게 입력해주세요.");
+                $("#Email").val();
+                $("#Email").focus();
+                return false;
+            }
+            // 비밀번호 공백 확인
+            if ($("#Password").val() == "") {
+                alert("비밀번호를 입력하세요.");
+                $("#Password").focus();
+                return false;
+            }
+            // "비밀번호" 정규식 체크
+            if (!regPassword.test($("#Password").val())) {
+                alert("비빌번호는 최소 8자(대소문자, 숫자, 특수기호 최소 각각 1자)가 필요합니다.");
+                $("#Password").val("");
+                $("#Password").focus();
+                return false;
+            }
+            // "비밀번호 확인" 공백 확인
+            if ($("#PasswordConfirm").val() == "") {
+                alert("비밀번호를 한번 더 입력하세요.");
+                $("#PasswordConfirm").focus();
+                return false;
+            }
+            // "비밀번호" 일치 여부
+            var Password = $("#Password").val();
+            var PasswordConfirm = $("#PasswordConfirm").val();
+            if (Password != PasswordConfirm) {
+                alert("비밀번호가 일치하지 않습니다.");
+                $("#PasswordConfirm").val("");
+                $("#PasswordConfirm").focus();
+                return false;
+            }
+            return false;
+        };
+</script>
+
+</head>
+<body>
+    <form class="form-horizontal" id="RegistrationForm" onsubmit="return RegisterValidation()" method="post">
+
+        <div class="form-group">
+            <label>이름</label>
+            <input type="text" class="form-control" id="Name" placeholder="이름" />
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="text" class="form-control" id="Email" placeholder="예) example@srook.net" />
+        </div>
+        <div class="form-group">
+            <label>비밀번호</label>
+            <input type="password" class="form-control" id="Password" placeholder="비밀번호" />
+        </div>
+        <div class="form-group">
+            <label>비밀번호 확인</label>
+            <input type="password" class="form-control" id="PasswordConfirm" placeholder="비밀번호 확인" />
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">회원가입</button>
+            <a class="btn btn-default" href="javascript:window.history.back();">취소</a>
+        </div>
+
+    </form>
+</body>
+</html>
