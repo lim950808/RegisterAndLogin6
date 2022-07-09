@@ -13,17 +13,24 @@ namespace RegisterAndLogin6.Controllers
             return View();
         }
 
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-
         public ActionResult Contact()
         {
             ViewBag.Message = "Your contact page.";
 
+            return View();
+        }
+
+        // Dapper CRUD Board
+        public ActionResult Board()
+        {
+            ViewBag.Message = "자유게시판";
+
+            return View();
+        }
+
+        // 로그인 후 welcome 페이지
+        public ActionResult Welcome()
+        {
             return View();
         }
     }
