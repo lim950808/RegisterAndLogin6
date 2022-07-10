@@ -25,7 +25,7 @@ namespace RegistrationAndLogin7.Controllers
         {
             using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
             {
-                string registerQuery = @"INSERT INTO [dbo].[Account] ([UserId], [Email], [Password]) VALUES (@UserId, @Email, @Password)";
+                string registerQuery = @"INSERT INTO [dbo].[Account2] ([UserId], [Email], [Password]) VALUES (@UserId, @Email, @Password)";
                 //var result = db.Execute(registerQuery, account);
                 db.Execute(registerQuery, account);
             }
@@ -53,7 +53,7 @@ namespace RegistrationAndLogin7.Controllers
         {
             using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
             {
-                string loginQuery = @"SELECT * FROM [dbo].[Account] WHERE UserId = @UserID AND Password = @Password";
+                string loginQuery = @"SELECT * FROM [dbo].[Account2] WHERE UserId = @UserID AND Password = @Password";
                 db.QueryFirstOrDefault(loginQuery, account);
             }
             return RedirectToAction("Welcome", "Home");
@@ -157,7 +157,7 @@ namespace RegistrationAndLogin7.Controllers
         {
             using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
             {
-                string deleteQuery = "DELETE Account WHERE Id = @Id";
+                string deleteQuery = "DELETE Account2 WHERE Id = @Id";
                 db.Execute(deleteQuery, new { Id = Id });
             }
         }
