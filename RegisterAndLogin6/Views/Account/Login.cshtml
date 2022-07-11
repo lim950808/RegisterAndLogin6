@@ -5,10 +5,13 @@
     <hr />
 
     <script>
-        function LoginValidation() {
+
+        @*function LoginValidation() {
+
             var account = {};
             account.UserId = $("#UserId").val();
             account.Password = $("#Password").val();
+
             $.ajax({
                 //contentType: "application/json",
                 //dataType: "json",  // 서버에서 보내줄 데이터의 타입
@@ -29,9 +32,11 @@
                     alert("Error!!!!!!!!!");
                 }
             });
-        }
-        $(document).ready(function () {
+        }*@
+
+        @*$(document).ready(function () {
             $("#btnLogin").on("click", function () {
+
                 // "아이디" 공백 확인
                 if ($("#UserId").val() == "") {
                     alert("아이디를 입력하세요.");
@@ -44,11 +49,11 @@
                     $("#Password").focus();
                     return false;
                 }
+
                 var account = {};
                 account.UserId = $("#UserId").val();
                 account.Password = $("#Password").val();
-                @*var UserId = $("#UserId").val();
-                var Password = $("#Password").val();*@
+
                 $.ajax({
                     contentType: "application/json",
                     dataType: "json",  // 서버에서 보내줄 데이터의 타입
@@ -70,30 +75,77 @@
                     }
                 });
             });
+        });*@
+
+        @*$(document).ready(function () {
+            $('#btnLogin').click(function () {
+                var data = {
+                    'UserId': $('#UserId').val(),
+                    'Password': $('#Password').val()
+                };
+                $.ajax({
+                    url: '/Account/ValidateAccount',
+                    type: 'POST',
+                    data: JSON.stringify(data),
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    success: function (response) {
+                        if (response.Success) {
+                            alert("환영합니다.");
+                            window.location.href = "/Home/Welcome";
+                        }
+                        else {
+                            alert("아이디와 비밀번호를 다시 한번 확인해주세요.");
+                            window.location.href = "/Account/Login";
+                        }
+                    },
+                    error: function () {
+                        alert('Login Fail!!!');
+                    }
+                });
+            });
+        });*@
+
+        $('btnLogin').click(function () {
+            $, ajax({
+                url: "Account/Login?UserId=" + UserId + "&Password=" + Password,
+                success: function (result) {
+                    if (result == "Authenticated") {
+                        $("#UserId").submit();
+                        alert("로그인 성공!!!");
+                        window.location.href = "/Home/Welcome";
+                    }
+                    else {
+                        alert("로그인 실패!!!");
+                    }
+                }
+            });
         });
+
+
     </script>
 
 </head>
 <body>
-    @*<form class="form-horizontal" id="LoginForm" method="post">*@
+    <form class="form-horizontal" id="LoginForm" method="post">
 
-    <div class="form-group">
-        <label>아이디</label>
-        <input type="text" class="form-control" id="UserId" placeholder="아이디" />
-    </div>
-    <div class="form-group">
-        <label>비밀번호</label>
-        <input type="password" class="form-control" id="Password" placeholder="비밀번호" />
-    </div>
-    <div class="form-group">
-        <input type="checkbox" value="RememberMe" id="RememberMe"> <label for="RememberMe">Remember me?</label>
-    </div>
+        <div class="form-group">
+            <label>아이디</label>
+            <input type="text" class="form-control" id="UserId" placeholder="아이디" />
+        </div>
+        <div class="form-group">
+            <label>비밀번호</label>
+            <input type="password" class="form-control" id="Password" placeholder="비밀번호" />
+        </div>
+        <div class="form-group">
+            <input type="checkbox" value="RememberMe" id="RememberMe"> <label for="RememberMe">Remember me?</label>
+        </div>
 
-    <div class="form-group">
-        <button type="submit" class="btn btn-primary" onclick="LoginValidation();" value="Login" id="btnLogin">로그인</button>
-        <a class="btn btn-default" href="javascript:window.history.back();">취소</a>
-    </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary" onclick="LoginValidation();" value="Login" id="btnLogin">로그인</button>
+            <a class="btn btn-default" href="javascript:window.history.back();">취소</a>
+        </div>
 
-    @*</form>*@
+    </form>
 </body>
 </html>

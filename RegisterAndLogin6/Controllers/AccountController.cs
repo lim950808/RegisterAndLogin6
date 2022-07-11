@@ -9,9 +9,9 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 using Dapper;
-using RegistrationAndLogin6.Models;
+using RegisterAndLogin6.Models;
 
-namespace RegistrationAndLogin7.Controllers
+namespace RegisterAndLogin6.Controllers
 {
     public class AccountController : Controller
     {
@@ -25,17 +25,196 @@ namespace RegistrationAndLogin7.Controllers
         {
             using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
             {
-                string registerQuery = @"INSERT INTO [dbo].[Account2] ([UserId], [Email], [Password]) VALUES (@UserId, @Email, @Password)";
+                string registerQuery = @"INSERT INTO [dbo].[Account] ([UserId], [Email], [Password]) VALUES (@UserId, @Email, @Password)";
                 //var result = db.Execute(registerQuery, account);
                 db.Execute(registerQuery, account);
             }
             return RedirectToAction("Login", "Account");
         }
 
+        /* 아이디 중복확인 */
+        public string CheckUserId(string UserId)
+        {
+            using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+            {
+                string sql = @"SELECT * FROM Account WHERE UserId = @UserId";
+                var status = db.Query<Account>(sql, new { UserId = UserId }).FirstOrDefault();
+                if (status != null)
+                {
+                    return "1"; //이미 DB에 있는 아이디 (중복된 아이디)
+                }
+                else
+                {
+                    return "0"; //DB에 없는 아이디 (사용 가능한 아이디)
+                }
+            }
+        }
+
+        /*[System.Web.Services.WebMethod]
+        public static string CheckUserId(string UserId)
+        {
+            string result = "";
+            SqlConnection con = new SqlConnection("Server=localhost;User=test;Password=1234;Database=test;");
+            con.Open();
+            SqlCommand cmd = new SqlCommand("SELECT * FROM Account WHERE UserId = @UserId", con);
+            cmd.Parameters.AddWithValue("@UserId", UserId);
+            SqlDataReader dr = cmd.ExecuteReader();
+            if (dr.HasRows)
+            {
+                result = "true";
+            }
+            else
+            {
+                result = "false";
+            }
+            return result;
+        }*/
+
+        /*[HttpPost]
+        public JsonResult doesUserNameExist(string UserId)
+        {
+
+            var user = Membership.GetUser(UserId);
+
+            return Json(user == null);
+        }*/
+
+        /*[System.Web.Services.WebMethod]
+        public static bool CheckUserName(string UserId)
+        {
+            bool status = false;
+            string constr = ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString;
+            using (SqlConnection conn = new SqlConnection(constr))
+            {
+                using (SqlCommand cmd = new SqlCommand("CheckUserAvailability", conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@UserId", UserId.Trim());
+                    conn.Open();
+                    status = Convert.ToBoolean(cmd.ExecuteScalar());
+                    conn.Close();
+                }
+            }
+            return status;
+        }*/
+
+        /*[HttpPost]
+        public JsonResult CheckUserId(string UserId)
+        {
+            using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+            {
+                //bool isValid = !db.Users.ToList().Exists(p => p.UserId.Equals(UserId, StringComparison.CurrentCultureIgnoreCase));
+                var sql = "SELECT * FROM ACCOUNT (nolock) WHERE UserId = @UserId";
+                bool isValid = !db.QueryFirstOrDefault(sql).ToList();
+                return Json(isValid);
+            }
+        }*/
+
+        /*[HttpPost]
+        public ActionResult Register(Account account)
+        {
+            using (SqlConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+            {
+                if (ModelState.IsValid)
+                {
+                    db.Open();
+                    if ((db.State & System.Data.ConnectionState.Open) > 0)
+                    {
+                        SqlCommand cmd = new SqlCommand("UserRegistration", db);
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.Add(new SqlParameter("@UserId", account.UserId));
+                        cmd.Parameters.Add(new SqlParameter("@Email", account.Email));
+                        cmd.Parameters.Add(new SqlParameter("@Password", account.Password));
+                        int results = cmd.ExecuteNonQuery();
+                    }
+                    db.Close();
+                    return View();
+                }
+                else
+                {
+                    return View();
+                }
+
+            }
+        }*/
+
+
         public ActionResult Login()
         {
             return View();
         }
+
+        /*[HttpPost]
+        public JsonResult ValidateAccount(string UserId, string Password)
+        {
+            using (var connection = new SqlConnection("Server=localhost;User=test;Password=1234;Database=test;"))
+            {
+                var data = @"SELECT * FROM Account (nolock) WHERE UserId = @UserId AND Password = @Password";
+                if (data.Count() > 0)
+                    return Json(new { Success = true }, JsonRequestBehavior.AllowGet);
+                else
+                    return Json(new { Success = false }, JsonRequestBehavior.AllowGet);
+            }
+        }*/
+
+        public ActionResult CheckAuthentication(string UserId, string Password)
+        {
+            using (SqlConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+            {
+                string sql = @"SELECT * FROM Account WHERE UserId = @UserId AND Password = @Password";
+                int count = db.Query<Account>(sql, new { UserId = UserId, Password = Password }).ToList().Count;
+                if (count == 1)
+                {
+                    return Json("Authenticated", JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    return Json("Failed");
+                }
+            }
+        }
+
+        [HttpPost]
+        public ActionResult Login(Account account, string returnUrl)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(account);
+            }
+            else
+            {
+                return View();
+            }
+        }
+
+        /*[HttpPost]
+        public ActionResult Login(Account account, string returnUrl)
+        {
+            if (ModelState.IsValid)
+            {
+                if (Membership.ValidateUser(account.UserId, account.Password))
+                {
+                    FormsAuthentication.SetAuthCookie(account.UserId, account.RememberMe);
+                    if (Url.IsLocalUrl(returnUrl) && returnUrl.Length > 1 && returnUrl.StartsWith("/")
+                        && !returnUrl.StartsWith("//") && !returnUrl.StartsWith("/\\"))
+                    {
+                        return Redirect(returnUrl);
+                    }
+                    else
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError("", "아이디 또는 비밀번호를 다시 한번 확인해주세요.");
+                }
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(account);
+        }*/
+
 
         /*[HttpPost]
         public ActionResult Login(string UserId, string Password)
@@ -48,16 +227,16 @@ namespace RegistrationAndLogin7.Controllers
             return RedirectToAction("Welcome", "Home");
         }*/
 
-        [HttpPost]
+        /*[HttpPost]
         public ActionResult Login(Account account)
         {
             using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
             {
-                string loginQuery = @"SELECT * FROM [dbo].[Account2] WHERE UserId = @UserID AND Password = @Password";
+                string loginQuery = @"SELECT * FROM [dbo].[Account] WHERE UserId = @UserID AND Password = @Password";
                 db.QueryFirstOrDefault(loginQuery, account);
             }
             return RedirectToAction("Welcome", "Home");
-        }
+        }*/
 
         /*public JsonResult CheckLogin(Account account)
         {
@@ -129,6 +308,7 @@ namespace RegistrationAndLogin7.Controllers
             }
             else
             {
+
             }
             return View();
         }*/
@@ -136,9 +316,17 @@ namespace RegistrationAndLogin7.Controllers
         // 로그아웃
         public ActionResult Logout()
         {
-            HttpContext.Session.Clear();
-            return RedirectToAction("Login", "Account");
+            FormsAuthentication.SignOut();
+
+            return RedirectToAction("Index", "Home");
         }
+
+        /*public ActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Index", "Home");
+        }*/
+
         /*[HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Logout()
@@ -146,18 +334,66 @@ namespace RegistrationAndLogin7.Controllers
             AuthenticationManager.Logout(DefaultAuthenticationTypes.ApplicationCookie);
             return RedirectToAction("Index", "Home");
         }*/
+
         /*public ActionResult Logout()
         {
             HttpContext.Session.Remove("UserId");
             return RedirectToAction("Login");
         }*/
 
+        /* 비밀번호 변경 */
+        [Authorize]
+        public ActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [Authorize]
+        [HttpPost]
+        public ActionResult ChangePassword(ChangePassword model)
+        {
+            if (ModelState.IsValid)
+            {
+
+                // ChangePassword will throw an exception rather
+                // than return false in certain failure scenarios.
+                bool changePasswordSucceeded;
+                try
+                {
+                    MembershipUser currentUser = Membership.GetUser(User.Identity.Name, true /* userIsOnline */);
+                    changePasswordSucceeded = currentUser.ChangePassword(model.OldPassword, model.NewPassword);
+                }
+                catch (Exception)
+                {
+                    changePasswordSucceeded = false;
+                }
+
+                if (changePasswordSucceeded)
+                {
+                    return RedirectToAction("성공적으로 비밀번호를 변경하였습니다.");
+                }
+                else
+                {
+                    ModelState.AddModelError("", "입력하신 비밀번호가 올바르지 않습니다. 다시 한번 확인해주세요.");
+                }
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
+        }
+
+        public ActionResult ChangePasswordSuccess()
+        {
+            return View();
+        }
+
+
         // 회원삭제
         public void Delete(int Id)
         {
             using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
             {
-                string deleteQuery = "DELETE Account2 WHERE Id = @Id";
+                string deleteQuery = "DELETE Account WHERE Id = @Id";
                 db.Execute(deleteQuery, new { Id = Id });
             }
         }

@@ -1,4 +1,4 @@
-﻿@model RegistrationAndLogin6.Models.Account
+﻿@model RegistrationAndLogin7.Models.Account
 @{
     ViewBag.Title = "Welcome";
 }
@@ -15,6 +15,11 @@
     <h2>환영합니다.</h2>
     <hr />
     Welcome @Session["UserId"]
+    @if (Request.IsAuthenticated)
+    {
+
+        <span>Welcome @Html.Encode(User.Identity.Name) </span>
+    }
     <br>
     <a href="@Url.Action("Logout", "Account")">Logout</a>
 </body>
