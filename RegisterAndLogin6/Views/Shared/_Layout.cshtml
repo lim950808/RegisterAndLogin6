@@ -23,12 +23,25 @@
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("홈", "Index", "Home")</li>
                     <li>@Html.ActionLink("연락처", "Contact", "Home")</li>
-                    <li>@Html.ActionLink("게시판", "Board", "Home")</li>
+                    @if (Session["UserId"] != null)
+                    {
+                        <li>@Html.ActionLink("게시판", "Board", "Home")</li>
+                    }
                 </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    <li>@Html.ActionLink("로그인", "Login", "Account")</li>
-                    <li>@Html.ActionLink("회원가입", "Register", "Account")</li>
-                </ul>
+                @if (Session["UserId"] == null)
+                {
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>@Html.ActionLink("로그인", "Login", "Account")</li>
+                        <li>@Html.ActionLink("회원가입", "Register", "Account")</li>
+                    </ul>
+                }
+                @if (Session["UserId"] != null)
+                {
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>@Html.ActionLink("내 정보", "MyInfo", "Account")</li>
+                        <li>@Html.ActionLink("로그아웃", "Logout", "Account")</li>
+                    </ul>
+                }
             </div>
             @*<div id="logindisplay">
                     @Html.Partial("_LoginPartial")

@@ -25,14 +25,14 @@ namespace RegisterAndLogin6.Controllers
         {
             using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
             {
-                string registerQuery = @"INSERT INTO [dbo].[Account] ([UserId], [Email], [Password]) VALUES (@UserId, @Email, @Password)";
+                string sql = @"INSERT INTO [dbo].[Account] ([UserId], [Email], [Password]) VALUES (@UserId, @Email, @Password)";
                 //var result = db.Execute(registerQuery, account);
-                db.Execute(registerQuery, account);
+                db.Execute(sql, account);
             }
             return RedirectToAction("Login", "Account");
         }
 
-        /* 아이디 중복확인 */
+        /* 회원가입 시 아이디 중복확인 */
         public string CheckUserId(string UserId)
         {
             using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
@@ -144,12 +144,72 @@ namespace RegisterAndLogin6.Controllers
             return View();
         }
 
+        [HttpPost]
+        public ActionResult Login(string UserId, string Password)
+        {
+            using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+            {
+                string result = "Fail";
+                string sql = "SELECT * FROM Account WHERE UserId = @UserId AND Password = @Password";
+                var data = db.Query<Account>(sql, new { UserId = UserId, Password = Password }).FirstOrDefault();
+                //db.QueryFirst<Account>(sql, new { UserId = UserId, Password = Password });
+
+                if (data != null)
+                {
+                    Session["UserId"] = data.UserId.ToString();
+                    result = "Success";
+                }
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        /*[HttpPost]
+        public ActionResult Login(Account account)
+        {
+            if (ModelState.IsValid)
+            {
+                using (SqlConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+                {
+                    var sql = @"SELECT * FROM Account (nolock) WHERE UserId = @UserId AND Password = @Password";
+                    var user = db.Query<Account>(sql, new { UserId = account.UserId, Password = account.Password }).FirstOrDefault();
+                    if (user != null)
+                    {
+                        Session["UserId"] = Convert.ToString(account.UserId);
+                        return RedirectToAction("Welcome", "Home");
+                    }
+                }
+            }
+            ModelState.AddModelError(string.Empty, "사용자 ID 혹은 비밀번호가 올바르지 않습니다.");
+            return View(account);
+        }*/
+
+
+        /*[HttpPost]
+        public ActionResult Login(Account account)
+        {
+            if (ModelState.IsValid)
+            {
+                using (SqlConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+                {
+                    var sql = @"SELECT * FROM Account (nolock) WHERE UserId = @UserId AND Password = @Password";
+                    var obj = db.Query<Account>(sql, new { UserId = account.UserId, Password = account.Password }).FirstOrDefault();
+                    if (obj != null)
+                    {
+                        Session["Id"] = obj.Id.ToString();
+                        Session["UserId"] = obj.UserId.ToString();
+                        return RedirectToAction("Index", "Home");
+                    }
+                }
+            }
+            return View(account);
+        }*/
+
         /*[HttpPost]
         public JsonResult ValidateAccount(string UserId, string Password)
         {
             using (var connection = new SqlConnection("Server=localhost;User=test;Password=1234;Database=test;"))
             {
-                var data = @"SELECT * FROM Account (nolock) WHERE UserId = @UserId AND Password = @Password";
+                var data = @"SELECT * FROM Account WHERE UserId = @UserId AND Password = @Password";
                 if (data.Count() > 0)
                     return Json(new { Success = true }, JsonRequestBehavior.AllowGet);
                 else
@@ -157,7 +217,30 @@ namespace RegisterAndLogin6.Controllers
             }
         }*/
 
-        public ActionResult CheckAuthentication(string UserId, string Password)
+        /*[HttpPost]
+        public ActionResult LoginUser(Account account)
+        {
+            using (SqlConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+            {
+                string sql = @"SELECT * FROM Account WHERE UserId = @UserId AND Password = @Password";
+                var status = db.Query<Account>(sql, new { UserId = account.UserId, Password = account.Password }).FirstOrDefault();
+                if (status != null)
+                {
+                    Session["UserId"] = account.UserId;
+                    Session.Timeout = 10;
+                    return RedirectToAction("Welcome", "Home");
+                }
+                else
+                {
+                    return View();
+                }
+            }
+        }*/
+
+
+
+
+        /*public ActionResult CheckAuthentication(string UserId, string Password)
         {
             using (SqlConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
             {
@@ -172,9 +255,9 @@ namespace RegisterAndLogin6.Controllers
                     return Json("Failed");
                 }
             }
-        }
+        }*/
 
-        [HttpPost]
+        /*[HttpPost]
         public ActionResult Login(Account account, string returnUrl)
         {
             if (!ModelState.IsValid)
@@ -185,7 +268,7 @@ namespace RegisterAndLogin6.Controllers
             {
                 return View();
             }
-        }
+        }*/
 
         /*[HttpPost]
         public ActionResult Login(Account account, string returnUrl)
@@ -287,39 +370,20 @@ namespace RegisterAndLogin6.Controllers
             }
         }*/
 
-        /*[HttpPost]
-        public ActionResult Login(Account account)
-        {
-            if (ModelState.IsValid)
-            {
-                using (IDbConnection db = new SqlConnection("Server=localhost;User=test;Password=1234;Database=test;"))
-                {
-                    var userLoggedIn = db.Execute();
-                    if (userLoggedIn != null)
-                    {
-                        return RedirectToAction("Index", "Home", new { UserId = account.UserId });
-                    }
-                    else
-                    {
-                        return View();
-                    }
-                }
-               return RedirectToAction("Index", "Home");
-            }
-            else
-            {
-
-            }
-            return View();
-        }*/
-
         // 로그아웃
         public ActionResult Logout()
+        {
+            Session.Clear();
+            Session.Abandon();
+            return RedirectToAction("Login", "Account");
+        }
+
+        /*public ActionResult Logout()
         {
             FormsAuthentication.SignOut();
 
             return RedirectToAction("Index", "Home");
-        }
+        }*/
 
         /*public ActionResult Logout()
         {
@@ -341,14 +405,33 @@ namespace RegisterAndLogin6.Controllers
             return RedirectToAction("Login");
         }*/
 
-        /* 비밀번호 변경 */
-        [Authorize]
-        public ActionResult ChangePassword()
+
+        /* 내 정보 */
+        public ActionResult MyInfo()
         {
-            return View();
+            if (Session["UserId"] != null)
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Login", "Account");
+            }
         }
 
-        [Authorize]
+        /* 비밀번호 변경 */
+        public ActionResult ChangePassword()
+        {
+            if (Session["UserId"] != null)
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Login", "Account");
+            }
+        }
+
         [HttpPost]
         public ActionResult ChangePassword(ChangePassword model)
         {

@@ -25,6 +25,11 @@
             }).done(function (msg) {
                 if (msg == 1) {
                     alert("중복된 아이디가 있습니다.");
+                    $("#UserId").val("");
+                    $("#UserId").focus();
+                } else if ($("#UserId").val() == "") {
+                    alert("아이디를 입력해주세요.");
+                    $("#UserId").focus();
                 } else {
                     alert("사용할 수 있는 아이디입니다!!");
                 }
@@ -42,6 +47,12 @@
                     $("#UserId").focus();
                     return false;
                 }
+
+                // "아이디 중복확인" 의무화
+                @*if (UserIdCheck() == 0) {
+                    alert("아이디 중복확인이 필요합니다.");
+                    return false;
+                }*@
 
                 // "Email" 공백 확인
                 if ($('#Email').val() == "") {

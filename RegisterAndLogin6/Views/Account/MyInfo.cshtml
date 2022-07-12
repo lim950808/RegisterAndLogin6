@@ -1,0 +1,27 @@
+﻿@model RegisterAndLogin6.Models.Account
+@{
+    ViewBag.Title = "MyInfo";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>MyInfo</title>
+</head>
+<body>
+
+    <h2>@(Session["UserId"].ToString())님의 정보</h2>
+    <a href="@Url.Action("ChangePassword", "Account")">비밀번호 변경</a> ㅣ
+    <a href="@Url.Action("Logout", "Account")">로그아웃</a>
+    <hr />
+    <table>
+        <tr>
+            hi
+        </tr>
+    </table>
+    <br>
+</body>
+</html>
+

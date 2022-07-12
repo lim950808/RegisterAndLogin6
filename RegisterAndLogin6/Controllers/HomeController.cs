@@ -15,12 +15,11 @@ namespace RegisterAndLogin6.Controllers
 
         public ActionResult Contact()
         {
-            ViewBag.Message = "Your contact page.";
+            ViewBag.Message = "회사정보";
 
             return View();
         }
 
-        // Dapper CRUD Board
         public ActionResult Board()
         {
             ViewBag.Message = "자유게시판";
@@ -28,10 +27,17 @@ namespace RegisterAndLogin6.Controllers
             return View();
         }
 
-        // 로그인 후 welcome 페이지
+        /* 로그인 후 Welcome 페이지 */
         public ActionResult Welcome()
         {
-            return View();
+            if (Session["UserId"] != null)
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Login", "Account");
+            }
         }
     }
 }

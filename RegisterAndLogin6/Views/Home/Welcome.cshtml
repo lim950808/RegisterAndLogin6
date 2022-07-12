@@ -1,4 +1,4 @@
-﻿@model RegistrationAndLogin7.Models.Account
+﻿@model RegisterAndLogin6.Models.Account
 @{
     ViewBag.Title = "Welcome";
 }
@@ -8,17 +8,17 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Success</title>
+    <title>Welcome</title>
 </head>
 <body>
 
-    <h2>환영합니다.</h2>
+    <h2>환영합니다. @(Session["UserId"].ToString())님</h2>
     <hr />
-    Welcome @Session["UserId"]
-    @if (Request.IsAuthenticated)
+    @if (Session["UserId"] != null)
     {
-
-        <span>Welcome @Html.Encode(User.Identity.Name) </span>
+        <text>
+            Welcome @Session["UserId"].ToString()
+        </text>
     }
     <br>
     <a href="@Url.Action("Logout", "Account")">Logout</a>
