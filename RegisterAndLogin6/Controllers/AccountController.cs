@@ -472,11 +472,11 @@ namespace RegisterAndLogin6.Controllers
 
 
         // 회원삭제
-        public void Delete(int Id)
+        public void Delete(int? Id)
         {
             using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
             {
-                string deleteQuery = "DELETE Account WHERE Id = @Id";
+                string deleteQuery = "DELETE FROM Account WHERE Id = @Id";
                 db.Execute(deleteQuery, new { Id = Id });
             }
         }
