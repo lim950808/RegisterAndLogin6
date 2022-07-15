@@ -25,7 +25,7 @@
                     <li>@Html.ActionLink("연락처", "Contact", "Home")</li>
                     @if (Session["UserId"] != null)
                     {
-                        <li>@Html.ActionLink("게시판", "Board", "Home")</li>
+                        <li>@Html.ActionLink("게시판", "Index", "Board")</li>
                     }
                 </ul>
                 @if (Session["UserId"] == null)

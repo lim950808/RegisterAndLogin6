@@ -1,0 +1,59 @@
+﻿@model RegisterAndLogin6.Models.Board
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Comment)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Comment)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.UserId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.UserId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Regdate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Regdate)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("뒤로가기", "Index")
+    |
+    @Html.ActionLink("수정", "Edit", new { id = Model.Id })
+    |
+    @Html.ActionLink("삭제", "Delete", new { id = Model.Id })
+</p>
