@@ -28,11 +28,33 @@ namespace RegisterAndLogin6.Controllers
         {
             using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
             {
-                string sql = @"INSERT INTO [dbo].[Account] ([UserId], [Email], [Password]) VALUES (@UserId, @Email, @Password)";
-                //var result = db.Execute(registerQuery, account);
+                //이메일 인증시 1, 그 전까진 0
+                account.EmailVerification = false;
+
+                //이메일 중복체크
+                /*var IsExists = IsEmailExists(account.Email);
+                if (IsExists)
+                {
+                    ModelState.AddModelError("EmailExists", "Email이 이미 존재합니다.");
+                    return View();
+                }*/
+
+                //GUID(전역 고유 식별자) 방식으로 유사난수 ActivationCode 생성. dddddddd-dddd-dddd-dddd-dddddddddddd 형식
+                account.ActivationCode = Guid.NewGuid();
+
+                //비밀번호 변환
+                account.Password = encryptPassword.textToEncrypt(account.Password);
+
+                //
+                string sql = @"INSERT INTO [dbo].[Account] ([UserId], [Email], [Password], [EmailVerification], [ActivationCode], [OTP]) VALUES (@UserId, @Email, @Password, @EmailVerification, @ActivationCode, @OTP)";
                 db.Execute(sql, account);
+
+                SendEmailToUser(account.Email, account.ActivationCode.ToString());
+                var Message = "회원가입이 거의 완료되었습니다." +
+                              "이메일 인증하기 => " + account.Email;
+                ViewBag.Message = Message;
             }
-            return RedirectToAction("Login", "Account");
+            return View("EmailVerification");
         }
 
         /* 회원가입 시 아이디 중복확인 */
@@ -60,14 +82,33 @@ namespace RegisterAndLogin6.Controllers
         }
 
         /* 로그인: POST */
+        //[HttpPost]
+        //public ActionResult Login(string UserId, string Password)
+        //{
+        //    using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+        //    {
+        //        string result = "Fail";
+        //        string sql = "SELECT * FROM Account WHERE UserId = @UserId AND Password = @Password";
+        //        var data = db.Query<Account>(sql, new { UserId = UserId, Password = Password }).FirstOrDefault();
+        //        if (data != null)
+        //        {
+        //            Session["UserId"] = data.UserId.ToString();
+        //            result = "Success";
+        //        }
+        //        return Json(result, JsonRequestBehavior.AllowGet);
+        //    }
+        //}
+        /**/
+
         [HttpPost]
         public ActionResult Login(string UserId, string Password)
         {
             using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
             {
                 string result = "Fail";
+                var _password = encryptPassword.textToEncrypt(Password);
                 string sql = "SELECT * FROM Account WHERE UserId = @UserId AND Password = @Password";
-                var data = db.Query<Account>(sql, new { UserId = UserId, Password = Password }).FirstOrDefault();
+                var data = db.Query<Account>(sql, new { UserId = UserId, Password = _password }).FirstOrDefault();
                 if (data != null)
                 {
                     Session["UserId"] = data.UserId.ToString();
@@ -86,11 +127,18 @@ namespace RegisterAndLogin6.Controllers
         }
 
         /* 내 정보 */
-        public ActionResult MyInfo()
+        public ActionResult MyInfo(string Id)
         {
             if (Session["UserId"] != null)
             {
-                return View();
+                Account account = new Account();
+                using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+                {
+                    //var _password = encryptPassword.textToEncrypt(Password);
+                    //string sql = "SELECT * FROM Account WHERE Id = @Id";
+                    account = db.Query<Account>("SELECT UserId, Email, Password FROM Account WHERE Id =" + Id, new { Id }).FirstOrDefault();
+                }
+                return View(account);
             }
             else
             {
@@ -117,36 +165,36 @@ namespace RegisterAndLogin6.Controllers
                     return View();
                 }
                 string sql = @"SELECT * FROM Account WHERE Email = @Email";
-                var objUsr = db.Query<Account>(sql, new { Email = account.Email }).FirstOrDefault();
+                var data = db.Query<Account>(sql, new { Email = account.Email }).FirstOrDefault();
 
-                // Genrate OTP     
+                // OTP 생성
                 string OTP = GenerateOTP();
 
-                objUsr.ActivationCode = Guid.NewGuid();
-                objUsr.OTP = OTP;
-                objCon.Entry(objUsr).State = System.Data.Entity.EntityState.Modified;
-                objCon.SaveChanges();
+                data.ActivationCode = Guid.NewGuid();
+                data.OTP = OTP;
+                string query = "UPDATE Account SET OTP = @OTP WHERE Id = @Id";
+                db.Execute(query, data);
 
-                ForgetPasswordEmailToUser(objUsr.Email, objUsr.ActivationCode.ToString(), objUsr.OTP);
-                var Message = "발송된 이메일 내 URL를 클릭 후 발급된 OTP 인증번호와 함께 새로운 비밀번호를 입력해주세요. => " + objUsr.Email;
+                ForgetPasswordEmailToUser(data.Email, data.ActivationCode.ToString(), data.OTP);
+                var Message = "발송된 이메일 내 URL를 클릭 후 발급된 OTP 인증번호와 함께 새로운 비밀번호를 입력해주세요. => " + data.Email;
                 ViewBag.Message = Message;
 
                 return View("FindPassword");
             }
         }
 
-        // 이메일 중복체크
+        /* 이메일 중복체크 */
         public bool IsEmailExists(string Email)
         {
             using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
             {
-                string sql = @"SELECT * FROM Account WHERE Email = @Email";
+                string sql = "SELECT * FROM Account WHERE Email = @Email";
                 var IsCheck = db.Query<Account>(sql, new { Email = Email }).FirstOrDefault();
                 return IsCheck != null;
             }
         }
 
-        // OTP 생성
+        /* OTP 생성 */
         public string GenerateOTP()
         {
             string OTPLength = "4";
@@ -169,14 +217,14 @@ namespace RegisterAndLogin6.Controllers
             return OTP;
         }
 
-        // 비밀번호 변경시 SMTP
-        public void ForgetPasswordEmailToUser(string emailId, string activationCode, string OTP)
+        /* 비밀번호 리셋 시 SMTP */
+        public void ForgetPasswordEmailToUser(string Email, string ActivationCode, string OTP)
         {
-            var GenerateUserVerificationLink = "/Register/ChangePassword/" + activationCode;
+            var GenerateUserVerificationLink = "/Account/ResetPassword/" + ActivationCode;
             var link = Request.Url.AbsoluteUri.Replace(Request.Url.PathAndQuery, GenerateUserVerificationLink);
-            var fromMail = new MailAddress("lim950808@naver.com", "Srook");
+            var fromMail = new MailAddress("lim950808@naver.com", "Srook 비밀번호 변경");
             var fromEmailpassword = "Dlawodjr@8@8";
-            var toEmail = new MailAddress(emailId);
+            var toEmail = new MailAddress(Email);
 
             var smtp = new SmtpClient();
             smtp.Host = "smtp.naver.com";
@@ -195,15 +243,43 @@ namespace RegisterAndLogin6.Controllers
             smtp.Send(Message);
         }
 
-        // 회원가입 이메일 인증시 SMTP
-        public void SendEmailToUser(string emailId, string activationCode)
+        /* ForgetPassword -> OTP -> 비밀번호 리셋: GET */
+        public ActionResult ResetPassword()
         {
-            var GenerateUserVerificationLink = "/Register/UserVerification/" + activationCode;
+            return View();
+        }
+
+        /* ForgetPassword -> OTP -> 비밀번호 리셋: POST */
+        [HttpPost]
+        public ActionResult ResetPassword(Account account)
+        {
+            using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+            {
+                string sql = "SELECT * FROM Account WHERE OTP = @OTP";
+                var data = db.Query<Account>(sql, new { OTP = account.OTP }).FirstOrDefault();
+                if (data != null)
+                {
+                    data.Password = encryptPassword.textToEncrypt(account.Password);
+                    db.Execute(sql, account);
+                    return RedirectToAction("Login", "Account");
+                }
+                else
+                {
+                    return View();
+                }
+            }
+        }
+
+
+        /* 회원가입 이메일 인증시 SMTP */
+        public void SendEmailToUser(string Email, string ActivationCode)
+        {
+            var GenerateUserVerificationLink = "/Account/UserVerification/" + ActivationCode;
             var link = Request.Url.AbsoluteUri.Replace(Request.Url.PathAndQuery, GenerateUserVerificationLink);
 
-            var fromMail = new MailAddress("lim950808@naver.com", "스룩페이"); // 보내는 사람(관리자, admin) 이메일  
-            var fromEmailpassword = "Dlawodjr@8@8"; // 보내는 사람(관리자, admin) 비밀번호     
-            var toEmail = new MailAddress(emailId); // 받는 사람 이메일
+            var fromEmail = new MailAddress("lim950808@naver.com", "Srook 회원가입 이메일 인증"); // 보내는 사람(관리자, admin) 이메일  
+            var fromEmailPassword = "Dlawodjr@8@8"; // 보내는 사람(관리자, admin) 비밀번호     
+            var toEmail = new MailAddress(Email); // 받는 사람 이메일
 
             var smtp = new SmtpClient();
             smtp.Host = "smtp.naver.com"; // 네이버 메일. Gmail은 2022.05.30일부터 "보안 수준이 낮은 앱" 서비스 종료.
@@ -211,41 +287,46 @@ namespace RegisterAndLogin6.Controllers
             smtp.EnableSsl = true; // SSL(Secure Sockets Layer)를 이용하여 연결을 암호화 할지 여부
             smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
             smtp.UseDefaultCredentials = false;
-            smtp.Credentials = new NetworkCredential(fromMail.Address, fromEmailpassword);
+            smtp.Credentials = new NetworkCredential(fromEmail.Address, fromEmailPassword);
 
-            var Message = new MailMessage(fromMail, toEmail);
+            var Message = new MailMessage(fromEmail, toEmail);
             Message.Subject = "회원가입 이메일 인증";
-            Message.Body = "<br/> 회원가입이 성공적으로 완료되었습니다." +
+            Message.Body = "<br/> 회원가입이 거의 완료되었습니다." +
                            "<br/> 아래의 링크를 눌러 이메일 인증을 해주세요." +
                            "<br/><br/><a href=" + link + ">" + link + "</a>";
             Message.IsBodyHtml = true; // IsBodyHtml : 전자 메일 메시지 본문의 형식이 HTML인지 여부
             smtp.Send(Message); // 예) https://localhost:44343/Register/UserVerification/8782e81a-99d6-4565-910b-f422260b4c70
         }
 
-        // 회원가입 후 이메일 인증
-        public ActionResult UserVerification(string id)
+        /* 회원가입 후 이메일 인증 */
+        public ActionResult UserVerification(string Id)
         {
-            bool Status = false;
+            bool status = false;
 
-            objCon.Configuration.ValidateOnSaveEnabled = false; //SaveChanges를 호출할 때 추적된 엔터티의 유효성을 자동으로 검사해야 하는지 여부. 기본값은 true.
-            var IsVerify = objCon.UserMs.Where(u => u.ActivetionCode == new Guid(id)).FirstOrDefault();
+            using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+            {
+                //bool status = false;
+                Account account = new Account();
+                string sql = "SELECT * FROM Account WHERE ActivationCode = @ActivationCode";
+                var IsVerify = db.Query<Account>(sql, new { ActivationCode = new Guid(Id) }).FirstOrDefault();
 
-            if (IsVerify != null)
-            {
-                IsVerify.EmailVerification = true;
-                objCon.SaveChanges();
-                ViewBag.Message = "이메일 인증이 완료되었습니다.";
-                Status = true;
+                if (IsVerify != null)
+                {
+                    IsVerify.EmailVerification = true;
+                    db.Execute(sql, account);
+                    status = true;
+                    ViewBag.Message = "이메일 인증이 완료되었습니다.";
+                }
+                else
+                {
+                    ViewBag.Message = "유효하지 않은 요청. 이메일 인증 실패!";
+                    ViewBag.status = false;
+                }
+                return View();
             }
-            else
-            {
-                ViewBag.Message = "유효하지 않은 요청. 이메일 인증 실패!";
-                ViewBag.Status = false;
-            }
-            return View();
         }
 
-        /* 비밀번호 변경: GET */
+        /* 내정보 -> 비밀번호 변경: GET */
         public ActionResult ChangePassword()
         {
             if (Session["UserId"] != null)
@@ -258,15 +339,12 @@ namespace RegisterAndLogin6.Controllers
             }
         }
 
-        /* 비밀번호 변경: POST */
+        /* 내정보 -> 비밀번호 변경: POST */
         [HttpPost]
         public ActionResult ChangePassword(ChangePassword model)
         {
             if (ModelState.IsValid)
             {
-
-                // ChangePassword will throw an exception rather
-                // than return false in certain failure scenarios.
                 bool changePasswordSucceeded;
                 try
                 {
