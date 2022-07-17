@@ -1,0 +1,56 @@
+﻿@model RegisterAndLogin6.Models.Account
+
+@{
+    ViewBag.Title = "Quit";
+}
+<script src="~/Scripts/jquery-3.6.0.min.js"></script>
+<h2>회원탈퇴</h2>
+<h3>@(Session["UserId"].ToString())님, 계정삭제시 복구가 어렵습니다. 정말 진행 하시겠습니까?</h3>
+<script>
+    $("#QuitBtn").click(function () {
+        if (confirm("회원탈퇴시 복구가 어렵습니다. 정말 진행 하시겠습니까?")) {
+            $("#QuitBtn").attr("href", "Home/Index");
+        } else {
+            return false;
+        }
+    });
+</script>
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.UserId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.UserId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Password)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Password)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="회원탈퇴" id="QuitBtn" class="btn btn-default" /> |
+            @Html.ActionLink("뒤로가기", "MyInfo")
+        </div>
+    }
+</div>

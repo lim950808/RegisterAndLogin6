@@ -185,6 +185,12 @@
     <Content Include="Views\Board\Create.cshtml" />
     <Content Include="Views\Board\Delete.cshtml" />
     <Content Include="Views\Board\Edit.cshtml" />
+    <Content Include="Views\Account\Quit.cshtml" />
+    <Content Include="Views\Account\EmailVerification.cshtml" />
+    <Content Include="Views\Account\FindPassword.cshtml" />
+    <Content Include="Views\Account\ForgetPassword.cshtml" />
+    <Content Include="Views\Account\ResetPassword.cshtml" />
+    <Content Include="Views\Account\UserVerification.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

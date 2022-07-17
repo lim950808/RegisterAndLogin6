@@ -1,28 +1,39 @@
-﻿@model RegisterAndLogin6.Models.Account
+﻿@model RegistrationAndLogin7.Models.Account
+
 @{
     ViewBag.Title = "MyInfo";
 }
 
-<!DOCTYPE html>
+<h2>@(Session["UserId"].ToString())님의 정보</h2>
+<a href="@Url.Action("ChangePassword", "Account")">비밀번호 변경</a> ㅣ
+<a href="@Url.Action("Quit", "Account")">회원탈퇴</a> ㅣ
+<a href="@Url.Action("Logout", "Account")">로그아웃</a>
+<hr />
 
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>MyInfo</title>
-</head>
-<body>
+<div>
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.UserId)
+        </dt>
 
-    <h2>@(Session["UserId"].ToString())님의 정보</h2>
-    <a href="@Url.Action("ChangePassword", "Account")">비밀번호 변경</a> ㅣ
-    <a href="@Url.Action("Delete", "Account")">회원탈퇴</a> ㅣ
-    <a href="@Url.Action("Logout", "Account")">로그아웃</a>
-    <hr />
-    <table>
-        <tr>
-            hi
-        </tr>
-    </table>
-    <br>
-</body>
-</html>
+        <dd>
+            @Html.DisplayFor(model => model.UserId)
+        </dd>
 
+        <dt>
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Password)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Password)
+        </dd>
+    </dl>
+</div>

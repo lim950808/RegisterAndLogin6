@@ -17,10 +17,13 @@
     @if (Session["UserId"] != null)
     {
         <text>
-            Welcome @Session["UserId"].ToString()
+            @Session["UserId"].ToString()님, 회원가입이 완료되었습니다!!
         </text>
     }
-    <br>
-    <a href="@Url.Action("Logout", "Account")">Logout</a>
+    <br />
+    <br />
+    <a href="@Url.Action("MyInfo", "Account")">내 정보</a>
+    ㅣ
+    <a href="@Url.Action("Logout", "Account")">로그아웃</a>
 </body>
 </html>
