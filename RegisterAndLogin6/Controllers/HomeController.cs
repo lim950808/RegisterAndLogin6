@@ -20,13 +20,6 @@ namespace RegisterAndLogin6.Controllers
             return View();
         }
 
-        public ActionResult Board()
-        {
-            ViewBag.Message = "자유게시판";
-
-            return View();
-        }
-
         /* 로그인 후 Welcome 페이지 */
         public ActionResult Welcome()
         {

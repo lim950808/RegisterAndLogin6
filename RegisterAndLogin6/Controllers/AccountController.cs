@@ -358,16 +358,16 @@ namespace RegisterAndLogin6.Controllers
         }
 
         /* 내정보 -> 비밀번호 변경: POST */
-        [HttpPost]
-        public ActionResult ChangePassword(ChangePassword model)
+        /*[HttpPost]
+        public ActionResult ChangePassword(Account account)
         {
             if (ModelState.IsValid)
             {
                 bool changePasswordSucceeded;
                 try
                 {
-                    MembershipUser currentUser = Membership.GetUser(User.Identity.Name, true /* userIsOnline */);
-                    changePasswordSucceeded = currentUser.ChangePassword(model.OldPassword, model.NewPassword);
+                    MembershipUser currentUser = Membership.GetUser(User.Identity.Name, true *//* userIsOnline *//*);
+                    changePasswordSucceeded = currentUser.ChangePassword(account.OldPassword, account.NewPassword);
                 }
                 catch (Exception)
                 {
@@ -385,8 +385,39 @@ namespace RegisterAndLogin6.Controllers
             }
 
             // If we got this far, something failed, redisplay form
-            return View(model);
-        }
+            return View(account);
+        }*/
+
+        /*[HttpPost]
+        public ActionResult ChangePassword(Account account)
+        {
+            using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
+            {
+                if (ModelState.IsValid)
+                {
+                    bool changePasswordSucceeded;
+                    try
+                    {
+                        string sql = "Update Account Set Password = @Password WHERE Id = @Id";
+                        changePasswordSucceeded = db.Execute(sql, account);
+                    }
+                    catch (Exception)
+                    {
+                        changePasswordSucceeded = false;
+                    }
+
+                    if (changePasswordSucceeded)
+                    {
+                        return RedirectToAction("성공적으로 비밀번호를 변경하였습니다.");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "입력하신 비밀번호가 올바르지 않습니다. 다시 한번 확인해주세요.");
+                    }
+                }
+            }
+            return View(account);
+        }*/
 
         /* 회원 탈퇴: Get */
         public ActionResult Quit()
