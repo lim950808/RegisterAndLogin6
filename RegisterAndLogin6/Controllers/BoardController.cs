@@ -13,13 +13,16 @@ namespace RegisterAndLogin6.Controllers
 {
     public class BoardController : Controller
     {
+        /* DB 연결 */
+        public string DbConnection = "Data Source=localhost;Initial Catalog=test;User Id=test;Password=1234";
+
         // GET: Board
         public ActionResult Index()
         {
             if (Session["UserId"] != null)
             {
                 List<Board> list = new List<Board>();
-                using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+                using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
                 {
                     list = db.Query<Board>("SELECT * FROM Board").ToList();
                 }
@@ -37,7 +40,7 @@ namespace RegisterAndLogin6.Controllers
             if (Session["UserId"] != null)
             {
                 Board board = new Board();
-                using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+                using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
                 {
                     board = db.Query<Board>("SELECT * FROM Board WHERE Id =" + Id, new { Id }).SingleOrDefault();
                 }
@@ -66,7 +69,7 @@ namespace RegisterAndLogin6.Controllers
         [HttpPost]
         public ActionResult Create(Board board)
         {
-            using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+            using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
             {
                 board.UserId = Session["UserId"].ToString();
                 string sql = "INSERT INTO Board (Title, Comment, UserId, Regdate) VALUES (@Title, @Comment, @UserId, GETDATE())";
@@ -84,7 +87,7 @@ namespace RegisterAndLogin6.Controllers
                 /*if (Session["UserId"].ToString() == board.UserId)
                 {*/
                 //Board board = new Board();
-                using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+                using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
                 {
                     string sql = "SELECT * FROM Board WHERE Id = @Id";
                     board = db.Query<Board>(sql, new { Id }).SingleOrDefault();
@@ -106,7 +109,7 @@ namespace RegisterAndLogin6.Controllers
         [HttpPost]
         public ActionResult Edit(Board board)
         {
-            using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+            using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
             {
                 string sql = "UPDATE Board SET Title = @Title, Comment = @Comment, Regdate = GETDATE() WHERE Id = @Id";
                 db.Execute(sql, board);
@@ -123,7 +126,7 @@ namespace RegisterAndLogin6.Controllers
                 if (Session["UserId"].ToString() == board.UserId)
                 {*/
                 Board board = new Board();
-                using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+                using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
                 {
                     string sql = "SELECT * FROM Board WHERE Id = @Id";
                     board = db.Query<Board>(sql, new { Id }).SingleOrDefault();
@@ -145,7 +148,7 @@ namespace RegisterAndLogin6.Controllers
         [HttpPost]
         public ActionResult Delete(Board board)
         {
-            using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
+            using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
             {
                 string sql = "DELETE FROM Board WHERE Id = @Id";
                 db.Execute(sql, board);

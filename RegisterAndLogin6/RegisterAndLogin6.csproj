@@ -133,6 +133,7 @@
     <Compile Include="Models\Board.cs" />
     <Compile Include="Models\ChangePassword.cs" />
     <Compile Include="Models\Department.cs" />
+    <Compile Include="Models\encryptPassword.cs" />
     <Compile Include="Models\LoginStatus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
