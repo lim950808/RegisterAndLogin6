@@ -22,7 +22,14 @@ namespace RegisterAndLogin6.Controllers
         /* 회원가입: GET */
         public ActionResult Register()
         {
-            return View();
+            if (Session["UserId"] != null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                return View();
+            }
         }
 
         /* 회원가입: POST */
@@ -80,7 +87,14 @@ namespace RegisterAndLogin6.Controllers
         /* 로그인: GET */
         public ActionResult Login()
         {
-            return View();
+            if (Session["UserId"] != null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                return View();
+            }
         }
 
         /* 로그인: POST */
@@ -112,9 +126,7 @@ namespace RegisterAndLogin6.Controllers
                 string result = "Fail";
                 var ConvertedPassword = encryptPassword.textToEncrypt(account.Password);
                 string sql = "SELECT * FROM Account WHERE UserId = @UserId AND Password = @Password";
-                account.Email = db.Query("SELECT Email FROM Account WHERE UserId = @UserId AND Password = @Password", new { UserId = account.UserId, Password = account.Password, Email = account.Email, ActivationCode = account.ActivationCode }).FirstOrDefault();
-                account.ActivationCode = Guid.NewGuid();
-                var data = db.Query<Account>(sql, new { UserId = account.UserId, Password = ConvertedPassword, Email = account.Email, ActivationCode = account.ActivationCode }).FirstOrDefault();
+                var data = db.Query<Account>(sql, new { UserId = account.UserId, Password = ConvertedPassword }).FirstOrDefault();
                 if (data != null)
                 {
                     if (data.EmailVerification == true) //이메일 인증 했을시(1) 로그인 성공.
@@ -122,10 +134,12 @@ namespace RegisterAndLogin6.Controllers
                         Session["UserId"] = data.UserId.ToString();
                         result = "Success";
                     }
-                    else //이메일 인증 안 했을시(0) 이메일 인증 페이지로 넘어감.
+                    else //이메일 인증 안 했을시(0) 이메일 인증 페이지로 넘어감. 오류 수정 중.
                     {
-                        /*string Email = account.Email;
-                        string ActivationCode = account.ActivationCode.ToString();*/
+                        var Email = db.Query("SELECT Email FROM Account WHERE UserId = @UserId AND Password = @Password", new { UserId = account.UserId, Password = ConvertedPassword }).FirstOrDefault();
+                        var ActivationCode = db.Query("SELECT ActivationCode FROM Account WHERE UserId = @UserId AND Password = @Password", new { UserId = account.UserId, Password = ConvertedPassword }).FirstOrDefault();
+                        account.Email = Email;
+                        account.ActivationCode = ActivationCode;
                         SendEmailToUser(account.Email, account.ActivationCode.ToString());
                         var Message = "회원가입시 이메일 인증이 필요합니다." + "이메일 인증하기 => " + account.Email;
                         ViewBag.Message = Message;
@@ -210,7 +224,7 @@ namespace RegisterAndLogin6.Controllers
                 {
                     //var _password = encryptPassword.textToEncrypt(Password);
                     //string sql = "SELECT * FROM Account WHERE Id = @Id";
-                    account = db.Query<Account>("SELECT UserId, Email, Password FROM Account WHERE Id =" + Id, new { Id }).FirstOrDefault();
+                    //account = db.Query<Account>("SELECT UserId, Email, Password FROM Account WHERE Id =" + Id, new { Id }).FirstOrDefault();
                 }
                 return View(account);
             }
@@ -223,7 +237,14 @@ namespace RegisterAndLogin6.Controllers
         /* 비밀번호 찾기: GET */
         public ActionResult ForgetPassword()
         {
-            return View();
+            if (Session["UserId"] != null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                return View();
+            }
         }
 
         /* 비밀번호 찾기: POST */
@@ -358,16 +379,16 @@ namespace RegisterAndLogin6.Controllers
         }
 
         /* 내정보 -> 비밀번호 변경: POST */
-        /*[HttpPost]
-        public ActionResult ChangePassword(Account account)
+        [HttpPost]
+        public ActionResult ChangePassword(ChangePassword model)
         {
             if (ModelState.IsValid)
             {
                 bool changePasswordSucceeded;
                 try
                 {
-                    MembershipUser currentUser = Membership.GetUser(User.Identity.Name, true *//* userIsOnline *//*);
-                    changePasswordSucceeded = currentUser.ChangePassword(account.OldPassword, account.NewPassword);
+                    MembershipUser currentUser = Membership.GetUser(User.Identity.Name, true /* userIsOnline */);
+                    changePasswordSucceeded = currentUser.ChangePassword(model.OldPassword, model.NewPassword);
                 }
                 catch (Exception)
                 {
@@ -385,39 +406,8 @@ namespace RegisterAndLogin6.Controllers
             }
 
             // If we got this far, something failed, redisplay form
-            return View(account);
-        }*/
-
-        /*[HttpPost]
-        public ActionResult ChangePassword(Account account)
-        {
-            using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
-            {
-                if (ModelState.IsValid)
-                {
-                    bool changePasswordSucceeded;
-                    try
-                    {
-                        string sql = "Update Account Set Password = @Password WHERE Id = @Id";
-                        changePasswordSucceeded = db.Execute(sql, account);
-                    }
-                    catch (Exception)
-                    {
-                        changePasswordSucceeded = false;
-                    }
-
-                    if (changePasswordSucceeded)
-                    {
-                        return RedirectToAction("성공적으로 비밀번호를 변경하였습니다.");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("", "입력하신 비밀번호가 올바르지 않습니다. 다시 한번 확인해주세요.");
-                    }
-                }
-            }
-            return View(account);
-        }*/
+            return View(model);
+        }
 
         /* 회원 탈퇴: Get */
         public ActionResult Quit()

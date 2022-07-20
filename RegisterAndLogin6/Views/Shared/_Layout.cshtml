@@ -26,6 +26,7 @@
                     @if (Session["UserId"] != null)
                     {
                         <li>@Html.ActionLink("게시판", "Index", "Board")</li>
+                        <li>@Html.ActionLink("SPA", "Index", "SPA")</li>
                     }
                 </ul>
                 @if (Session["UserId"] == null)
