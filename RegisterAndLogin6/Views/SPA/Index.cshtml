@@ -1,4 +1,4 @@
-﻿@model IEnumerable<RegisterAndLogin6.Models.SPA.CommentList>
+﻿@model IEnumerable<RegistrationAndLogin7.Models.SPA.CommentList>
 @{
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -29,79 +29,120 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@item.Id</td>
-                @*<td><a href="#" onclick="return editComment(@item.Id, '@item.Comment')">@item.Id</a></td>*@
-                <td>@item.Comment</td>
-                @*<td><a class="data_Comment" href="#" data-Id="@item.Id">@item.Comment</a></td>*@
+                @*<td>@item.Id</td>*@
+                <td>
+                    <a class="data_Id" href="#" onclick="return editComment(@item.Id, '@item.Comment')">@item.Id</a>
+                </td>
+                @*<td>@item.Comment</td>*@
+                <td>
+                    <a class="data_Comment" href="#" data-Id="@item.Id">@item.Comment</a>
+                </td>
                 @*<td>@item.UserId</td>*@
                 <td>
                     <a href="#" onclick="return mention(@item.Id)">@item.UserId</a>
                 </td>
                 <td>@item.Regdate</td>
                 <td>
-                    <a href="#" onclick="return editComment(@item.Id, '@item.Comment')">수정</a> |
+                    @*<a href="#" onclick="return editComment(@item.Id, '@item.Comment')">수정</a> |*@
+                    <input type="button" onclick="return editComment(@item.Id, '@item.Comment')" value="수정" />
                     @*<a href="#" id="btn_delete" onclick="return deleteComment()">삭제</a>*@
-                    <a href="#" id="btn_delete">삭제</a>
+                    @* <a href="#" type="button" id="btn_delete">삭제</a>*@
+                    <input type="button" id="btn_delete" value="삭제" />
                 </td>
             </tr>
         }
     </tbody>
 </table>
 
+<!-- 이미지 파일만 선택가능 -->
+@*<input type='file' accept='image/*' onchange='openFile(event)'>
+    <br>
+    <img id='output'>
+    <script>
+        var openFile = function (event) {
+            var input = event.target;
 
-<!-- 게시글 영역 -->
-@*<div class="Comment" id="Comment">
-    
-</div>*@
-<!-- 게시글 영역 -->
-<!-- 댓글 영역 -->
-@*<div class="Reply" id="Reply">
-    <button type="button" class="btn btn-primary" onclick="ReplySubmit()" value="Login" id="btnLogin">등록</button>
-</div>*@
-<!--// 댓글 영역 -->
+            var reader = new FileReader();
+            reader.onload = function () {
+                var dataURL = reader.result;
+                var output = document.getElementById('output');
+                output.src = dataURL;
+            };
+            reader.readAsDataURL(input.files[0]);
+        };
+    </script>*@
+
+<!-- 전체 파일 선택가능 -->
+<input type="file" id="imgInput" onchange="readURL(this)">
+<br>
+<div id="previewDiv"></div>
+<script>
+    function readURL(obj) {
+        let reader = new FileReader();
+        if (!obj.files.length) {
+            return;
+        }
+        reader.readAsDataURL(obj.files[0]);
+        reader.onload = function (e) {
+            let img = $('<img />');
+            $(img).attr('src', e.target.result);
+            $('#previewDiv').append(img);
+        }
+    }
+</script>
 
 <script>
     function editComment(_Id, _Comment) {
-        $(".hid_Id").val(_Id)
-        $(".txt_Comment").val(_Comment)
-        return false
-    };
-
-    @*function deleteComment () {
-        //$(".txt_Comment").val("");
+        $(".txt_Comment").val(_Comment);
         return false;
-    };*@
+    }
+
+    function deleteComment(_Id, _Comment) {
+        $(".txt_Comment").val("");
+        return false;
+    };
 
     function mention() {
         $(".txt_Comment").val("멘션기능추가");
         $(".txt_Comment").focus();
         return false;
     }
+</script>
 
+<script>
     $(document).ready(() => {
+        // Insert or Update
         $("#btn_save").on("click", function () {
             $.ajax({
                 method: "POST",
                 url: "/SPA/Update",
                 data: { Id: ($(".txt_Comment").data("Id") == undefined ? 0 : $(".txt_Comment").data("Id")), Comment: $(".txt_Comment").val() },
+                //data: { Id: ($(".txt_Comment").data("Id") == null ? 0 : $(".txt_Comment").data("Id")), Comment: $(".txt_Comment").val() },
                 success: function () {
-                    alert("저장완료!!");
+                    if ($(".txt_Comment").data("Id") == undefined) {
+                        alert("신규 저장 완료");
+                    } else {
+                        alert("수정 완료");
+                    }
                     window.location.reload();
                 }
             })
         });
 
+        // Delete
         $("#btn_delete").on("click", function () {
+            var Id = $(".data_Id").val();
             $.ajax({
                 method: "POST",
                 url: "/SPA/Delete",
-                //data: { Id = Id },
+                data: { Id: Id },
                 success: function () {
                     alert("삭제 완료!!");
                     window.location.reload();
                 }
             })
         });
+
 
         $("a.data_Comment").on("click", function () {
             $(".txt_Comment").data("Id", $(this).data("Id"))
@@ -110,93 +151,126 @@
         });
 
     });
+</script>
 
-    @*let page = 1
-    let pagesize = 10
 
-    $(document).ready(function () {
-        CommentList();
-        //ReplyList();
-    })
+@*<script type="text/javascript">
+        function answerEdit(Id, UserId, Comment) {
+            $('#acontent' + answer_idx).html(
+                "<textarea id='edit_acontent" + Id + "'>" + Comment + "</textarea>"
+                + "<style>#edit_acontent" + Id + "{width:740px; height:80px; resize:none;} </style>"
+            );
 
-    var CommentSubmit = function () {
-        var Comment = $("#Comment").val();
-        $.ajax({
-            type: "POST",
-            url: "/SPA/CommentSubmit",
-            data: {
-                Comment: Comment
-            },
-            success: function () {
-                alert("게시글이 등록되었습니다.");
-                CommentList();
-            }
-        })
-    }
-
-    function CommentList() {
-        let _commentList = $(".Comment");
-        for (let i = 0; i < pagesize; i++) {
-            $(_commentList).append(addCommentList())
+            $('#abt' + Id).html(
+                "<a onclick='answerEditSave(" + Id + ")' id='btnEdit'>완료</a> "
+                + "<a onclick='location.href='qnaDetail.do?idx=" + "' id='btnCancel'>취소</a>"
+            );
         }
 
-        let _data = {
-            page: page,
-            pagesize: pagesize
+        function answerEditSave(answer_idx) {
+            var Comment = $("#edit_acontent" + Id).val();
+            location.href = 'answerEdit.do?Id=' + Id + "&Comment=" + Comment;
         }
+    </script>*@
 
+<hr />
+<textarea class="txt_Reply" placeholder="댓글을 입력해주세요."></textarea>
+@*<input type="text" class="txt_Reply" />*@
+<input type="button" id="btn_ReplySave" value="저장" />
+<br>
+<br>
+<!-- 이미지 파일만 선택가능 -->
+<input type='file' accept='image/*' onchange='openFile(event)'>
+<br>
+<img id='output'>
+<script>
+    var openFile = function (event) {
+        var input = event.target;
+
+        var reader = new FileReader();
+        reader.onload = function () {
+            var dataURL = reader.result;
+            var output = document.getElementById('output');
+            output.src = dataURL;
+        };
+        reader.readAsDataURL(input.files[0]);
+    };
+</script>
+<br />
+<br />
+@foreach (var item in Model)
+{
+    <div class="reply-wrap">
+        @*<div class='reply-image'>
+                <img src='@item.Image'>
+            </div>*@
+        <div class="reply-content">
+            <div class="reply-group">
+                @*<strong class="left" onclick="return mention(@item.Id)">@item.UserId</strong>*@
+                <strong><a href="#" data-UserId="@item.Id" onclick="return ReplyMention('@item.UserId')">@item.UserId</a></strong>
+                <small class="left">@item.Regdate</small>
+                <a href="#" class="right"><span class="glyphicon glyphicon-pencil"></span>수정</a>
+                <a href="#" class="right" id="btn_ReplyDelete"><span class="glyphicon glyphicon-remove"></span>삭제</a>
+            </div>
+            <p class="clearfix">@item.Comment</p>
+        </div>
+    </div>
+}
+
+<script>
+    @*$(document).ready(function () {
+        getReplyList();
+    });
+
+    function getReplyList() {
+        //var Id = $("#Id");
         $.ajax({
+            url: "/SPA/Index",
             type: "POST",
-            url: "@Url.Action("CommentList", "SPA", new {Id = commentList.Id})",
-            data: _data,
-            success: function (data) {
-                let _commentList = $(".Comment");
-                for (let i = 0; i < data.length; i++) {
+            dataType: "json",
+            success: function (result) {
 
-                }
             }
         })
-
-    }
-
-
-    var ReplySubmit = function () {
-        var Reply = $("#Reply").val();
-        $.ajax({
-            type: "POST",
-            url: "/SPA/ReplySubmit",
-            data: {
-                Reply: Reply
-            },
-            success: function () {
-                alert("댓글이 등록되었습니다.");
-                ReplyList();
-            }
-        })
-    }
-
-    function ReplyList() {
-        let _replyList = $(".Reply");
-        for (let i = 0; i < pagesize; i++) {
-            $(_replyList).append(addReplyList())
-        }
-
-        let _data = {
-            page: page,
-            pagesize: pagesize
-        }
-
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("ReplyList", "SPA", new {Id = Id})",
-            data: _data,
-            success: function (data) {
-                let _replyList = $(".Reply");
-                for (let i = 0; i < data.length; i++) {
-
-                }
-            }
-        })
-
     }*@
+
+
+    /* 해당 UserId 클릭시 입력창에 mention됨 */
+    function ReplyMention(_UserId) {
+        $(".txt_Reply").val(_UserId);
+        $(".txt_Reply").focus();
+        return false;
+    }
+
+    $("#btn_ReplySave").click(function () {
+        //var Id = $("#")
+        $.ajax({
+            method: "POST",
+            url: "/SPA/Update",
+            data: { Id: ($(".txt_Reply").data("Id") == undefined ? 0 : $(".txt_Reply").data("Id")), Comment: $(".txt_Reply").val() },
+            success: function () {
+                if ($(".txt_Reply").data("Id") == undefined) {
+                    alert("신규 저장 완료");
+                } else {
+                    alert("수정 완료");
+                }
+                window.location.reload();
+            }
+        })
+    });
+
+    // Delete
+    $("#btn_ReplyDelete").on("click", function () {
+        var Id = $(".data_Id").val();
+        $.ajax({
+            method: "POST",
+            url: "/SPA/Delete",
+            data: { Id: Id },
+            success: function () {
+                alert("삭제 완료!!");
+                window.location.reload();
+            }
+        })
+    });
+
 </script>

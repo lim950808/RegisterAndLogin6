@@ -1,231 +1,175 @@
-﻿@model IEnumerable<RegisterAndLogin6.Models.SPA.CommentList>
-@{
-    ViewBag.Title = "Index";
-Layout = "~/Views/Shared/_Layout.cshtml";
+﻿using Dapper;
+using RegisterAndLogin6.Models.SPA;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
 
-    @*RegisterAndLogin6.Models.SPA.CommentList commentList = ViewBag.comment as RegisterAndLogin6.Models.SPA.CommentList;
-
-RegisterAndLogin6.Models.SPA.ReplyList replyList = ViewBag.reply as RegisterAndLogin6.Models.SPA.ReplyList; *@
-}
-
-< h2 > Single Page Application</h2>
-   <script src = "~/Scripts/jquery-3.6.0.min.js" ></ script >
-   
-
-   < hr />
-   
-
-   < input type= "text" class= "txt_Comment" />
-     < input type = "button" id = "btn_save" value = "저장" />
-          
-
-          < table class= "table" >
-           
-               < thead >
-           
-                   < tr >
-           
-                       < th > 번호 </ th >
-           
-                       < th > 글내용 </ th >
-           
-                       < th > 작성자 </ th >
-           
-                       < th > 작성일 </ th >
-           
-                   </ tr >
-           
-               </ thead >
-           
-               < tbody >
-                   @foreach(var item in Model)
-        {
-            < tr >
-                < td > @item.Id </ td >
-                @*< td >< a href = "#" onclick = "return editComment(@item.Id, '@item.Comment')" > @item.Id </ a ></ td > *@
-                < td > @item.Comment </ td >
-                @*< td >< a class= "data_Comment" href = "#" data - Id = "@item.Id" > @item.Comment </ a ></ td > *@
-                @*< td > @item.UserId </ td > *@
-                < td >
-                    < a href = "#" onclick = "return mention(@item.Id)" > @item.UserId </ a >
-   
-                   </ td >
-   
-                   < td > @item.Regdate </ td >
-   
-                   < td >
-   
-                       < a href = "#" onclick = "return editComment(@item.Id, '@item.Comment')" > 수정 </ a > |
-                    @*< a href = "#" id = "btn_delete" onclick = "return deleteComment()" > 삭제 </ a > *@
-                    < a href = "#" id = "btn_delete" > 삭제 </ a >
-                    @*< input type = "button" id = "btn_delete" value = "삭제" /> *@
-                </ td >
-            </ tr >
-        }
-    </ tbody >
-</ table >
-
-
-< !--게시글 영역-- >
-@*< div class= "Comment" id = "Comment" >
-  
-
-  </ div > *@
-< !--게시글 영역-- >
-< !--댓글 영역-- >
-@*< div class= "Reply" id = "Reply" >
-  
-      < button type = "button" class= "btn btn-primary" onclick = "ReplySubmit()" value = "Login" id = "btnLogin" > 등록 </ button >
-          </ div > *@
-< !--// 댓글 영역 -->
-
-< script >
-    function editComment(_Id, _Comment) {
-        $(".hid_Id").val(_Id);
-        $(".txt_Comment").val(_Comment);
-    return false;
-};
-
-    @*function deleteComment() {
-    //$(".txt_Comment").val("");
-    return false;
-}; *@
-
-    function mention()
+namespace RegisterAndLogin6.Controllers
 {
-        $(".txt_Comment").val("멘션기능추가");
-        $(".txt_Comment").focus();
-    return false;
-}
-
-    $(document).ready(() => {
-        $("#btn_save").on("click", function() {
-            $.ajax({
-         method: "POST",
-                url: "/SPA/Update",
-                data: { Id: ($(".txt_Comment").data("Id") == undefined ? 0 : $(".txt_Comment").data("Id")), Comment: $(".txt_Comment").val() },
-                success: function() {
-    alert("저장완료!!");
-    window.location.reload();
-}
-            })
-        });
-
-        $("#btn_delete").on("click", function() {
-            //var Id = $("#btn_delete").val();
-            $.ajax({
-    method: "POST",
-                url: "/SPA/Delete",
-                data: { Id = Id },
-                success: function() {
-            alert("삭제 완료!!");
-            window.location.reload();
-        }
-    })
-        });
-
-        $("a.data_Comment").on("click", function() {
-            $(".txt_Comment").data("Id", $(this).data("Id"))
-            $(".txt_Comment").val($(this).text())
-            return false;
-});
-
-    });
-
-    @*let page = 1
-    let pagesize = 10
-
-    $(document).ready(function() {
-    CommentList();
-    //ReplyList();
-})
-
-    var CommentSubmit = function() {
-        var Comment = $("#Comment").val();
-        $.ajax({
-type: "POST",
-            url: "/SPA/CommentSubmit",
-            data:
+    public class SPAController : Controller
     {
-    Comment: Comment
-            },
-            success: function() {
-        alert("게시글이 등록되었습니다.");
-        CommentList();
-    }
-})
-    }
+        /* DB 연결 */
+        public string DbConnection = "Data Source=localhost;Initial Catalog=test;User Id=test;Password=1234";
 
-    function CommentList()
-{
-    let _commentList = $(".Comment");
-    for (let i = 0; i < pagesize; i++)
-    {
-            $(_commentList).append(addCommentList())
-        }
-
-    let _data = {
-            page: page,
-            pagesize: pagesize
-        }
-
-        $.ajax({
-type: "POST",
-            url: "@Url.Action("CommentList", "SPA", new {Id = commentList.Id})",
-            data: _data,
-            success: function(data) {
-        let _commentList = $(".Comment");
-        for (let i = 0; i < data.length; i++)
+        // GET: SPA
+        /*public JsonResult Index(string Id)
         {
+            if (Session["UserId"] != null)
+            {
+                using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
+                {
+                    return Json(db.Query<Models.SPA.Comment>("sp_SPA_Comment", new { Id = Id }, null, true, null, System.Data.CommandType.StoredProcedure));
+                }
+            }
+            else
+            {
+                return ;
+            }
+        }*/
 
-        }
-    }
-})
-
-    }
-
-
-    var ReplySubmit = function() {
-        var Reply = $("#Reply").val();
-        $.ajax({
-type: "POST",
-            url: "/SPA/ReplySubmit",
-            data:
-    {
-    Reply: Reply
-            },
-            success: function() {
-        alert("댓글이 등록되었습니다.");
-        ReplyList();
-    }
-})
-    }
-
-    function ReplyList()
-{
-    let _replyList = $(".Reply");
-    for (let i = 0; i < pagesize; i++)
-    {
-            $(_replyList).append(addReplyList())
-        }
-
-    let _data = {
-            page: page,
-            pagesize: pagesize
-        }
-
-        $.ajax({
-type: "POST",
-            url: "@Url.Action("ReplyList", "SPA", new {Id = Id})",
-            data: _data,
-            success: function(data) {
-        let _replyList = $(".Reply");
-        for (let i = 0; i < data.length; i++)
+        // GET: SPA
+        /*public JsonResult Index(string Id)
         {
+            using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
+            {
+                return Json(db.Query<Models.SPA.CommmentList>("sp_SPA_CommentList_Select", new { Id = Id }, null, true, null, System.Data.CommandType.StoredProcedure));
+            }
+        }*/
 
+        // GET: SPA
+        public ActionResult Index()
+        {
+            if (Session["UserId"] != null)
+            {
+                List<CommentList> list = new List<CommentList>();
+                using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
+                {
+                    list = db.Query<CommentList>("SELECT * FROM CommentList (nolock)").ToList();
+                    //return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Select", new { Id = Id }, null, true, null, System.Data.CommandType.StoredProcedure));
+                }
+                return View(list);
+            }
+            else
+            {
+                return RedirectToAction("Login", "Account");
+            }
         }
-    }
-})
 
-    }*@
-</ script >
+        [HttpPost]
+        public ActionResult Update(int Id, string Comment)
+        {
+            using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
+            {
+                string sql = string.Empty;
+                if (Id == 0) // Insert
+                {
+                    sql = string.Format("INSERT INTO CommentList (Comment, UserId, Regdate) values ('{0}', '{1}', GETDATE())", Comment, Session["UserId"].ToString());
+                }
+                else // Update
+                {
+                    sql = string.Format("UPDATE CommentList SET Comment = '{0}' WHERE Id = {1}", Comment, Id);
+                }
+
+                db.Execute(sql);
+            }
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public ActionResult Delete(int Id)
+        {
+            using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
+            {
+                string sql = string.Format("DELETE FROM CommentList WHERE Id = {0}", Id);
+                db.Execute(sql);
+            }
+            return RedirectToAction("Index");
+        }
+
+
+        //------------------------------------------------------------------------------
+        // Comment: 게시글 //
+        //------------------------------------------------------------------------------
+
+        /* 게시글 Read */
+        /*public JsonResult CommentList(string Id)
+        {
+            using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
+            {
+                return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Select", new { Id = Id }, null, true, null, System.Data.CommandType.StoredProcedure));
+            }
+        }*/
+
+        /* 게시글 Create */
+        /*public JsonResult CommentSubmit(string Id)
+        {
+            using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
+            {
+                return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Insert", new { Id = Id }, null, true, null, System.Data.CommandType.StoredProcedure));
+            }
+        }
+
+        *//* 게시글 Update *//*
+        public JsonResult CommentUpdate(string Id)
+        {
+            using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
+            {
+                return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Update", new { Id = Id }, null, true, null, System.Data.CommandType.StoredProcedure));
+            }
+        }
+
+        *//* 게시글 Delete *//*
+        public JsonResult CommentDelete(string Id)
+        {
+            using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
+            {
+                return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Delete", new { Id = Id }, null, true, null, System.Data.CommandType.StoredProcedure));
+            }
+        }
+
+
+
+
+        //------------------------------------------------------------------------------
+        // Reply: 댓글 //
+        //------------------------------------------------------------------------------
+
+        *//* 댓글 Read *//*
+        public JsonResult ReplyList(string Id)
+        {
+            using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
+            {
+                return Json(db.Query<Models.SPA.ReplyList>("sp_SPA_ReplyList_Select", new { Id = Id }, null, true, null, System.Data.CommandType.StoredProcedure));
+            }
+        }
+
+        *//* 댓글 Create *//*
+        public JsonResult ReplySubmit(string Id)
+        {
+            using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
+            {
+                return Json(db.Query<Models.SPA.ReplyList>("sp_SPA_ReplyList_Insert", new { Id = Id }, null, true, null, System.Data.CommandType.StoredProcedure));
+            }
+        }
+
+        *//* 댓글 Update *//*
+        public JsonResult ReplyUpdate(string Id)
+        {
+            using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
+            {
+                return Json(db.Query<Models.SPA.ReplyList>("sp_SPA_ReplyList_Update", new { Id = Id }, null, true, null, System.Data.CommandType.StoredProcedure));
+            }
+        }
+
+        *//* 댓글 Delete *//*
+        public JsonResult ReplyDelete(string Id)
+        {
+            using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
+            {
+                return Json(db.Query<Models.SPA.ReplyList>("sp_SPA_ReplyList_Delete", new { Id = Id }, null, true, null, System.Data.CommandType.StoredProcedure));
+            }
+        }*/
+    }
+}
