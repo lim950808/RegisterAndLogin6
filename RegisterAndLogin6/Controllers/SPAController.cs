@@ -39,17 +39,20 @@ namespace RegisterAndLogin6.Controllers
         }*/
 
         // GET: SPA
-        public ActionResult Index()
+        public ActionResult Index(string Id)
         {
             if (Session["UserId"] != null)
             {
-                List<CommentList> list = new List<CommentList>();
+                //List<CommentList> list = new List<CommentList>();
                 using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
                 {
-                    list = db.Query<CommentList>("SELECT * FROM CommentList (nolock)").ToList();
+                    //ViewBag.CommentList = db.Query<CommentList>("sp_SPA_CommentList_Select", new { Id = Id }, null, true, null, System.Data.CommandType.StoredProcedure).ToList();
+                    ViewBag.CommentList = db.Query<CommentList>("SELECT * FROM CommentList (nolock)").ToList();
+                    //list = db.Query<CommentList>("SELECT * FROM CommentList (nolock)").ToList();
                     //return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Select", new { Id = Id }, null, true, null, System.Data.CommandType.StoredProcedure));
                 }
-                return View(list);
+                //return View(list);
+                return View();
             }
             else
             {

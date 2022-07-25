@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using Dapper;
 using RegisterAndLogin6.Models;
+using RegisterAndLogin6.Models.SPA;
 
 namespace RegisterAndLogin6.Controllers
 {
@@ -21,12 +22,14 @@ namespace RegisterAndLogin6.Controllers
         {
             if (Session["UserId"] != null)
             {
-                List<Board> list = new List<Board>();
                 using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
                 {
-                    list = db.Query<Board>("SELECT * FROM Board").ToList();
+                    //List<Board> list = new List<Board>();
+                    //list = db.Query<Board>("SELECT * FROM Board").ToList();
+                    ViewBag.boardIndex = db.Query<Board>("SELECT * FROM Board ORDER BY Id DESC").ToList();
                 }
-                return View(list);
+                //return View(list);
+                return View();
             }
             else
             {
@@ -34,17 +37,35 @@ namespace RegisterAndLogin6.Controllers
             }
         }
 
+        /*public JsonResult Index(string Id)
+        {
+            if (Session["UserId"] != null)
+            {
+                using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
+                {
+                    //List<Board> list = new List<Board>();
+                    //list = db.Query<Board>("SELECT * FROM Board").ToList();
+                    return Json(db.Query<CommentList>("sp_SPA_CommentList_Select", new { Id = Id }, null, true, null, System.Data.CommandType.StoredProcedure).ToList());
+                }
+            }
+            else
+            {
+                return RedirectToAction("Login", "Account");
+            }
+        }*/
+
         // GET: Board/Details/
         public ActionResult Details(int Id)
         {
             if (Session["UserId"] != null)
             {
-                Board board = new Board();
                 using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
                 {
-                    board = db.Query<Board>("SELECT * FROM Board WHERE Id =" + Id, new { Id }).SingleOrDefault();
+                    ViewBag.Board = db.Query<Board>("SELECT * FROM Board WHERE Id =" + Id + "ORDER BY Id DESC", new { Id }).SingleOrDefault();
+                    ViewBag.comment = db.Query<CommentList>("SELECT * FROM CommentList (nolock) ORDER BY Id DESC").ToList();
+                    //ViewBag.comment = db.Query<CommentList>("sp_SPA_CommentList_Select", new { Id = Id }, null, true, null, System.Data.CommandType.StoredProcedure).ToList();
                 }
-                return View(board);
+                return View();
             }
             else
             {
@@ -84,20 +105,20 @@ namespace RegisterAndLogin6.Controllers
             if (Session["UserId"] != null)
             {
                 Board board = new Board();
-                /*if (Session["UserId"].ToString() == board.UserId)
-                {*/
-                //Board board = new Board();
-                using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
+                if (Session["UserId"].ToString() == board.UserId)
                 {
-                    string sql = "SELECT * FROM Board WHERE Id = @Id";
-                    board = db.Query<Board>(sql, new { Id }).SingleOrDefault();
+                    //Board board = new Board();
+                    using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
+                    {
+                        string sql = "SELECT * FROM Board WHERE Id = @Id";
+                        board = db.Query<Board>(sql, new { Id }).SingleOrDefault();
+                    }
+                    return View(board);
                 }
-                return View(board);
-                /*}
                 else
                 {
-                    return RedirectToAction("Index");
-                }*/
+                    return RedirectToAction("MyInfo", "Account");
+                }
             }
             else
             {
@@ -154,6 +175,47 @@ namespace RegisterAndLogin6.Controllers
                 db.Execute(sql, board);
             }
             return RedirectToAction("Index");
+        }
+
+
+
+        /*========================================================================================================*/
+        /* 댓글 Reply */
+        /*========================================================================================================*/
+
+
+        /* 댓글 GetReplyList */
+        public JsonResult GetReplyList(string Id)
+        {
+            using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
+            {
+                return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Select", new { Id = Id }, null, true, null, System.Data.CommandType.StoredProcedure));
+            }
+        }
+
+        /* 댓글 ReplyUpdate */
+        public JsonResult ReplyUpdate(int Id, string Comment)
+        {
+            using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
+            {
+                if (Id == 0) // Insert (신규 저장 완료)
+                {
+                    return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Insert", new { Id = Id, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure));
+                }
+                else // Update (수정 완료)
+                {
+                    return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Update", new { Id = Id, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure));
+                }
+            }
+        }
+
+        /* 댓글 ReplyDelete */
+        public JsonResult ReplyDelete(int Id)
+        {
+            using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
+            {
+                return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Delete", new { Id = Id }, null, true, null, System.Data.CommandType.StoredProcedure));
+            }
         }
     }
 }

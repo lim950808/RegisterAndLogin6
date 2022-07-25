@@ -1,7 +1,7 @@
 ﻿@{
     ViewBag.Title = "SrookPay 자유게시판";
+    List<RegisterAndLogin6.Models.Board> boardIndex = ViewBag.boardIndex as List<RegisterAndLogin6.Models.Board>;
 }
-@model IEnumerable<RegisterAndLogin6.Models.Board>
 <!DOCTYPE html>
 <html>
 <head>
@@ -18,34 +18,33 @@
     <table class="table">
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Id)
+                No
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Title)
+                글제목
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.UserId)
+                작성자
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Regdate)
+                등록일
             </th>
             <th></th>
         </tr>
-
-        @foreach (var item in Model)
+        @foreach (var item in boardIndex)
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Id)
+                    @item.Id
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Title)
+                    @item.Title
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.UserId)
+                    @item.UserId
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Regdate)
+                    @item.Regdate
                 </td>
                 <td>
                     @Html.ActionLink("자세히", "Details", new { id = item.Id }) |

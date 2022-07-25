@@ -1,59 +1,191 @@
-﻿@model RegisterAndLogin6.Models.Board
+﻿@{
+    RegisterAndLogin6.Models.Board board = ViewBag.Board as RegisterAndLogin6.Models.Board;
+    List<RegisterAndLogin6.Models.SPA.CommentList> comment = ViewBag.comment as List<RegisterAndLogin6.Models.SPA.CommentList>;
+}
 
 @{
     ViewBag.Title = "Details";
 }
-
+<script src="~/Scripts/jquery-3.6.0.min.js"></script>
 <h2>Details</h2>
 
+<p>
+    @Html.ActionLink("뒤로가기", "Index")
+    |
+    @*@Html.ActionLink("수정", "Edit", new { id = Model.Id })*@
+    @Html.ActionLink("Details", "Board", new { Id = board.Id })
+    |
+    @*@Html.ActionLink("삭제", "Delete", new { id = Model.Id })*@
+    @Html.ActionLink("Delete", "Board", new { Id = board.Id })
+</p>
 <div>
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.Id)
+            No
         </dt>
-
         <dd>
-            @Html.DisplayFor(model => model.Id)
+            @board.Id
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.Title)
+            글제목
         </dt>
-
         <dd>
-            @Html.DisplayFor(model => model.Title)
+            @board.Title
         </dd>
-
         <dt>
-            @Html.DisplayNameFor(model => model.Comment)
+            글내용
         </dt>
-
         <dd>
-            @Html.DisplayFor(model => model.Comment)
+            @board.Comment
         </dd>
-
         <dt>
-            @Html.DisplayNameFor(model => model.UserId)
+            작성자
         </dt>
-
         <dd>
-            @Html.DisplayFor(model => model.UserId)
+            @board.UserId
         </dd>
-
         <dt>
-            @Html.DisplayNameFor(model => model.Regdate)
+            등록일
         </dt>
-
         <dd>
-            @Html.DisplayFor(model => model.Regdate)
+            @board.Regdate
         </dd>
-
     </dl>
+
+
+
+
+    <!--/////////////////////////////////////////////////////////////-->
+    <!-- Reply -->
+    <!--/////////////////////////////////////////////////////////////-->
+
+
+
+    <hr />
+    <textarea class="txt_Reply" placeholder="댓글을 입력해주세요."></textarea>
+    <input type="button" id="btn_ReplySave" value="저장" />
+
+    <br>
+    <br>
+
+    <!-- 이미지 파일만 선택가능 -->
+    <input type="file" id="file" accept='image/*'>
+    <img src="" id="image">
+    <script>
+        $("#file").on("change", function (e) {
+            var tmp = e.target.files[0];
+            var img = URL.createObjectURL(tmp);
+            $("#image").attr("src", img);
+        });
+    </script>
+
+    <br />
+    <br />
+
+    <!-- 댓글 리스트 -->
+    @foreach (var item in comment)
+    {
+        <div class="reply-wrap">
+            @*<div class='reply-image'>
+                    <img src='@item.Image'>
+                </div>*@
+            <div class="reply-content">
+                <div class="reply-group">
+                    <strong>
+                        <a href="#" data-Id="@item.Id" onclick="return ReplyMention('@item.UserId')">
+                            @item.UserId
+                        </a>
+                    </strong>
+                    <small class="left">
+                        @item.Regdate
+                    </small>
+                    <button type="button" class="btn btn-primary" id="data_Reply" data-Id="@item.Id" onclick="return EditComment(@item.Id, '@item.Comment')">
+                        <span class="glyphicon glyphicon-pencil"></span>수정
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="return DeleteReply(@item.Id)">
+                        <span class="glyphicon glyphicon-remove"></span>삭제
+                    </button>
+                </div>
+                <p class="clearfix">@item.Comment</p>
+            </div>
+        </div>
+    }
+
+    <script>
+        @*$(document).ready(function () {
+            getReplyList();
+        });
+
+        function getReplyList() {*@
+            @*var data = {
+                Id: @comment.Id
+            }*@
+            @*var Id = @comment.Id;
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("GetReplyList", "Board", new { Id = Id })',
+                success: function (result) {
+                    @(".reply-wrap > .reply-content > ")
+                }
+            })
+        }*@
+
+
+        /* 해당 UserId 클릭시 입력창에 Mention 됨 */
+        function ReplyMention(_UserId) {
+            $(".txt_Reply").val("[" + _UserId + "] ");
+            $(".txt_Reply").focus();
+            return false;
+        };
+
+        /* "수정" 버튼 클릭시 입력창에 해당 댓글이 보여짐 */
+        function EditComment(_Id, _Comment) {
+            $(".txt_Reply").val(_Comment);
+            //$("#file").val(_Image);
+            $(".txt_Reply").focus();
+            return false;
+        };
+
+        /* 댓글 Insert or Update */
+        $("#btn_ReplySave").click(function () {
+            var data = {
+                Id: $(".txt_Reply").data("Id") == undefined ? 0 : $(".txt_Reply").data("Id"),
+                Comment: $(".txt_Reply").val()
+                //Image: $("#file").val()
+            }
+            $.ajax({
+                type: "POST",
+                url: "/Board/ReplyUpdate",
+                data: data,
+                success: function () {
+                    if (Id = 0) {
+                        alert("신규 저장 완료");
+                    } else {
+                        alert("수정 완료");
+                    }
+                    window.location.reload();
+                }
+            })
+        });
+
+        $("#data_Reply").on("click", function () {
+            $(".txt_Reply").data("Id", $(this).data("Id"));
+            //$(".txt_Reply").val($(this).text());
+            return false;
+        });
+
+        /* 댓글 Delete */
+        var DeleteReply = function (_Id) {
+            $.ajax({
+                type: "POST",
+                url: "/Board/ReplyDelete",
+                data: { Id: _Id },
+                success: function () {
+                    alert("삭제 완료!!");
+                    window.location.reload();
+                }
+            })
+        };
+    </script>
 </div>
-<p>
-    @Html.ActionLink("뒤로가기", "Index")
-    |
-    @Html.ActionLink("수정", "Edit", new { id = Model.Id })
-    |
-    @Html.ActionLink("삭제", "Delete", new { id = Model.Id })
-</p>

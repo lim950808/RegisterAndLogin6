@@ -1,11 +1,11 @@
-﻿@model IEnumerable<RegistrationAndLogin7.Models.SPA.CommentList>
+﻿@*@model IEnumerable<RegistrationAndLogin7.Models.SPA.CommentList>*@
 @{
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
-    @*    RegistrationAndLogin7.Models.SPA.CommentList commentList = ViewBag.comment as RegistrationAndLogin7.Models.SPA.CommentList;
+    List<RegisterAndLogin6.Models.SPA.CommentList> commentList = ViewBag.CommentList as List<RegisterAndLogin6.Models.SPA.CommentList>;
 
-        RegistrationAndLogin7.Models.SPA.ReplyList replyList = ViewBag.reply as RegistrationAndLogin7.Models.SPA.ReplyList;*@
+    //RegistrationAndLogin7.Models.SPA.ReplyList replyList = ViewBag.ReplyList as RegistrationAndLogin7.Models.SPA.ReplyList;
 }
 
 <h2>Single Page Application</h2>
@@ -26,7 +26,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in commentList)
         {
             <tr>
                 @*<td>@item.Id</td>*@
@@ -198,7 +198,7 @@
 </script>
 <br />
 <br />
-@foreach (var item in Model)
+@foreach (var item in commentList)
 {
     <div class="reply-wrap">
         @*<div class='reply-image'>
