@@ -73,6 +73,19 @@ namespace RegisterAndLogin6.Controllers
             }
         }
 
+        /*public JsonResult Details(int Idm string Comment)
+        {
+            if (Session["UserId"] != null)
+            {
+                using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
+                {
+                    ViewBag.Board = db.Query<Board>("SELECT * FROM Board WHERE Id =" + Id + "ORDER BY Id DESC", new { Id }).SingleOrDefault();
+                    ViewBag.comment = db.Query<CommentList>("sp_SPA_CommentList_Select", new { Id = Id, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure).ToList();
+                    return Json(ViewBag.Board);
+                }
+            }
+        }*/
+
         // GET: Board/Create
         public ActionResult Create()
         {

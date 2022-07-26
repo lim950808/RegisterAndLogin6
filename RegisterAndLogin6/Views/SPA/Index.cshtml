@@ -34,7 +34,7 @@
                 </td>
                 @*<td>@item.Comment</td>*@
                 <td>
-                    <a class="data_Comment" href="#" data-Id="@item.Id">@item.Comment</a>
+                    <a class="data_Comment" href="#" data-id="@item.Id">@item.Comment</a>
                 </td>
                 @*<td>@item.UserId</td>*@
                 <td>
@@ -206,7 +206,7 @@
         <div class="reply-content">
             <div class="reply-group">
                 @*<strong class="left" onclick="return mention(@item.Id)">@item.UserId</strong>*@
-                <strong><a href="#" data-Id="@item.Id" onclick="return ReplyMention('@item.UserId')">@item.UserId</a></strong>
+                <strong><a href="#" data-id="@item.Id" onclick="return ReplyMention('@item.UserId')">@item.UserId</a></strong>
                 <small class="left">@item.Regdate</small>
                 <a href="#" class="right"><span class="glyphicon glyphicon-pencil"></span>수정</a>
                 <a href="#" class="right" id="btn_ReplyDelete"><span class="glyphicon glyphicon-remove"></span>삭제</a>
