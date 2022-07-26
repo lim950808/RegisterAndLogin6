@@ -1,11 +1,10 @@
-﻿@*@model IEnumerable<RegistrationAndLogin7.Models.SPA.CommentList>*@
-@{
+﻿@{
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     List<RegisterAndLogin6.Models.SPA.CommentList> commentList = ViewBag.CommentList as List<RegisterAndLogin6.Models.SPA.CommentList>;
 
-    //RegistrationAndLogin7.Models.SPA.ReplyList replyList = ViewBag.ReplyList as RegistrationAndLogin7.Models.SPA.ReplyList;
+    //RegisterAndLogin6.Models.SPA.ReplyList replyList = ViewBag.ReplyList as RegisterAndLogin6.Models.SPA.ReplyList;
 }
 
 <h2>Single Page Application</h2>
@@ -207,7 +206,7 @@
         <div class="reply-content">
             <div class="reply-group">
                 @*<strong class="left" onclick="return mention(@item.Id)">@item.UserId</strong>*@
-                <strong><a href="#" data-UserId="@item.Id" onclick="return ReplyMention('@item.UserId')">@item.UserId</a></strong>
+                <strong><a href="#" data-Id="@item.Id" onclick="return ReplyMention('@item.UserId')">@item.UserId</a></strong>
                 <small class="left">@item.Regdate</small>
                 <a href="#" class="right"><span class="glyphicon glyphicon-pencil"></span>수정</a>
                 <a href="#" class="right" id="btn_ReplyDelete"><span class="glyphicon glyphicon-remove"></span>삭제</a>

@@ -55,15 +55,15 @@ namespace RegisterAndLogin6.Controllers
         }*/
 
         // GET: Board/Details/
-        public ActionResult Details(int Id)
+        public ActionResult Details(int Id, string Comment)
         {
             if (Session["UserId"] != null)
             {
                 using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
                 {
                     ViewBag.Board = db.Query<Board>("SELECT * FROM Board WHERE Id =" + Id + "ORDER BY Id DESC", new { Id }).SingleOrDefault();
-                    ViewBag.comment = db.Query<CommentList>("SELECT * FROM CommentList (nolock) ORDER BY Id DESC").ToList();
-                    //ViewBag.comment = db.Query<CommentList>("sp_SPA_CommentList_Select", new { Id = Id }, null, true, null, System.Data.CommandType.StoredProcedure).ToList();
+                    //ViewBag.comment = db.Query<CommentList>("SELECT * FROM CommentList (nolock) ORDER BY Id DESC").ToList();
+                    ViewBag.comment = db.Query<CommentList>("sp_SPA_CommentList_Select", new { Id = Id, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure).ToList();
                 }
                 return View();
             }

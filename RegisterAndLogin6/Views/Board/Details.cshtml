@@ -63,15 +63,15 @@
 
 
     <hr />
-    <textarea class="txt_Reply" placeholder="댓글을 입력해주세요."></textarea>
-    <input type="button" id="btn_ReplySave" value="저장" />
+    <input class="txt_Reply" placeholder="댓글을 입력해주세요." />
+    <input type="button" class="btn btn-success" id="btn_ReplySave" value="저장" />
 
     <br>
     <br>
 
     <!-- 이미지 파일만 선택가능 -->
     <input type="file" id="file" accept='image/*'>
-    <img src="" id="image">
+    <img src="" id="image" height="100">
     <script>
         $("#file").on("change", function (e) {
             var tmp = e.target.files[0];
@@ -82,6 +82,14 @@
 
     <br />
     <br />
+
+    <!-- 댓글 리스트 -->
+    @*    <div class="reply-wrap">
+            <div class="reply-content">
+                <div class="reply-group">
+                </div>
+            </div>
+        </div>*@
 
     <!-- 댓글 리스트 -->
     @foreach (var item in comment)
@@ -100,14 +108,15 @@
                     <small class="left">
                         @item.Regdate
                     </small>
-                    <button type="button" class="btn btn-primary" id="data_Reply" data-Id="@item.Id" onclick="return EditComment(@item.Id, '@item.Comment')">
+                    <button type="button" class="btn btn-primary" id="data_Reply" data-id="@item.Id" onclick="return EditComment(@item.Id, '@item.Comment')">
+                        <!-- data-id는 lowercase로 써줘야 가져올 수 있다. -->
                         <span class="glyphicon glyphicon-pencil"></span>수정
                     </button>
                     <button type="button" class="btn btn-danger" onclick="return DeleteReply(@item.Id)">
                         <span class="glyphicon glyphicon-remove"></span>삭제
                     </button>
+                    <p class="clearfix" style="width:100px">@item.Comment</p>
                 </div>
-                <p class="clearfix">@item.Comment</p>
             </div>
         </div>
     }
@@ -117,24 +126,32 @@
             getReplyList();
         });
 
-        function getReplyList() {*@
-            @*var data = {
-                Id: @comment.Id
-            }*@
-            @*var Id = @comment.Id;
+        function getReplyList() {
+            let _itemList = $(".reply-group");
+            var data = new { Id = comment.Id }
+
             $.ajax({
                 type: "POST",
-                url: '@Url.Action("GetReplyList", "Board", new { Id = Id })',
+                url: "/Board/GetReplyList",
+                data: data,
                 success: function (result) {
-                    @(".reply-wrap > .reply-content > ")
+                    $.each(result, function (data) {
+                        $(".reply-wrap > .reply-content > .reply-group").append(data.Id);
+                        $(".reply-wrap > .reply-content > .reply-group").append(data.UserId);
+                        $(".reply-wrap > .reply-content > .reply-group").append(data.Regdate);
+                        $(".reply-wrap > .reply-content").append(data.Comment);
+                    });
+                },
+                error: function () {
+                    alert("Error!!!");
                 }
             })
         }*@
 
 
-        /* 해당 UserId 클릭시 입력창에 Mention 됨 */
+        /* 해당 UserId 클릭시 입력창에 멘션(Mention) 됨 */
         function ReplyMention(_UserId) {
-            $(".txt_Reply").val("[" + _UserId + "] ");
+            $(".txt_Reply").val("[" + _UserId + "] ").css("font-weight", "bold");
             $(".txt_Reply").focus();
             return false;
         };
@@ -147,8 +164,16 @@
             return false;
         };
 
+        /* "수정" 버튼 클릭시 입력창에 해당 Id의 data가 들어감 */
+        $("#data_Reply").on("click", function () {
+            $(".txt_Reply").data("Id", $(this).data("id"));
+            //console.log($(this).data("id"));
+            return false;
+        });
+
         /* 댓글 Insert or Update */
         $("#btn_ReplySave").click(function () {
+            console.log($(".txt_Reply").data("Id"));
             var data = {
                 Id: $(".txt_Reply").data("Id") == undefined ? 0 : $(".txt_Reply").data("Id"),
                 Comment: $(".txt_Reply").val()
@@ -159,7 +184,7 @@
                 url: "/Board/ReplyUpdate",
                 data: data,
                 success: function () {
-                    if (Id = 0) {
+                    if ($(".txt_Reply").data("Id") == undefined) {
                         alert("신규 저장 완료");
                     } else {
                         alert("수정 완료");
@@ -169,11 +194,6 @@
             })
         });
 
-        $("#data_Reply").on("click", function () {
-            $(".txt_Reply").data("Id", $(this).data("Id"));
-            //$(".txt_Reply").val($(this).text());
-            return false;
-        });
 
         /* 댓글 Delete */
         var DeleteReply = function (_Id) {
