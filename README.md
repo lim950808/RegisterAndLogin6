@@ -32,7 +32,7 @@ CREATE TABLE [dbo].[Board]<br>
 <pre>
 
 </pre>
-CREATE TABLE [dbo].[Comments]<br>
+CREATE TABLE [dbo].[CommentList]<br>
 (<br>
 	[Id] [int] IDENTITY(1,1) NOT NULL,<br>
 	[ParentId] [nvarchar](50) NULL,<br>
@@ -58,7 +58,7 @@ WITH CTE AS<br>
 		CONVERT(NVARCHAR(100), Id) Depth,<br>
 		UserId, <br>
 		Regdate<br>
-	FROM Comments<br>
+	FROM CommentList<br>
 	WHERE ParentId IS NULL<br>
 <br>
 	UNION ALL<br>
@@ -71,7 +71,7 @@ WITH CTE AS<br>
 		CONVERT(NVARCHAR(100), CONCAT(c.Depth, ',', b.Id)) Depth,<br>
 		b.UserId, <br>
 		b.Regdate<br>
-	FROM Comments b<br>
+	FROM CommentList b<br>
 	INNER JOIN CTE c<br>
 	ON b.ParentId = c.Id<br>
 )<br>
