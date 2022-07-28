@@ -55,7 +55,7 @@ namespace RegisterAndLogin6.Controllers
         }*/
 
         // GET: Board/Details/
-        public ActionResult Details(int Id, string Comment)
+        public ActionResult Details(int Id, string ParentId, string Lv, string Comment)
         {
             if (Session["UserId"] != null)
             {
@@ -63,7 +63,8 @@ namespace RegisterAndLogin6.Controllers
                 {
                     ViewBag.Board = db.Query<Board>("SELECT * FROM Board WHERE Id =" + Id + "ORDER BY Id DESC", new { Id }).SingleOrDefault();
                     //ViewBag.comment = db.Query<CommentList>("SELECT * FROM CommentList (nolock) ORDER BY Id DESC").ToList();
-                    ViewBag.comment = db.Query<CommentList>("sp_SPA_CommentList_Select", new { Id = Id, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure).ToList();
+                    //ViewBag.comment = db.Query<CommentList>("sp_SPA_CommentList_Select", new { Id = Id, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure).ToList();
+                    ViewBag.comment = db.Query<CommentList>("sp_SPA_CommentListWithCTE_Select", new { Id = Id, ParentId = ParentId, TopId = Id, Lv = Lv, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure).ToList();
                 }
                 return View();
             }
@@ -72,19 +73,6 @@ namespace RegisterAndLogin6.Controllers
                 return RedirectToAction("Login", "Account");
             }
         }
-
-        /*public JsonResult Details(int Idm string Comment)
-        {
-            if (Session["UserId"] != null)
-            {
-                using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
-                {
-                    ViewBag.Board = db.Query<Board>("SELECT * FROM Board WHERE Id =" + Id + "ORDER BY Id DESC", new { Id }).SingleOrDefault();
-                    ViewBag.comment = db.Query<CommentList>("sp_SPA_CommentList_Select", new { Id = Id, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure).ToList();
-                    return Json(ViewBag.Board);
-                }
-            }
-        }*/
 
         // GET: Board/Create
         public ActionResult Create()
@@ -207,16 +195,18 @@ namespace RegisterAndLogin6.Controllers
         }
 
         /* 댓글 ReplyUpdate */
-        public JsonResult ReplyUpdate(int Id, string Comment)
+        public JsonResult ReplyUpdate(int Id, string ParentId, int Lv, string Comment)
         {
             using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
             {
                 if (Id == 0) // Insert (신규 저장 완료)
                 {
-                    return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Insert", new { Id = Id, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure));
+                    //return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentListWithCTE_Insert", new { Id = Id, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure));
+                    return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Insert", new { Id = Id, ParentId = ParentId, TopId = Id, Lv = Lv, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure));
                 }
                 else // Update (수정 완료)
                 {
+                    //return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentListWithCTE_Update", new { Id = Id, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure));
                     return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Update", new { Id = Id, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure));
                 }
             }
@@ -227,6 +217,7 @@ namespace RegisterAndLogin6.Controllers
         {
             using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
             {
+                //return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentListWithCTE_Delete", new { Id = Id }, null, true, null, System.Data.CommandType.StoredProcedure));
                 return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Delete", new { Id = Id }, null, true, null, System.Data.CommandType.StoredProcedure));
             }
         }
