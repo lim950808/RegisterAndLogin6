@@ -19,109 +19,130 @@
     @Html.ActionLink("Delete", "Board", new { Id = board.Id })
 </p>
 <div>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            No
-        </dt>
-        <dd>
-            @board.Id
-        </dd>
-        <dt>
-            글제목
-        </dt>
-        <dd>
-            @board.Title
-        </dd>
-        <dt>
-            글내용
-        </dt>
-        <dd>
-            @board.Comment
-        </dd>
-        <dt>
-            작성자
-        </dt>
-        <dd>
-            @board.UserId
-        </dd>
-        <dt>
-            등록일
-        </dt>
-        <dd>
-            @board.Regdate
-        </dd>
-    </dl>
+    <div class="row">
+        <hr />
+        @*<dl class="dl-horizontal">
+                <dt>
+                    No
+                </dt>
+                <dd>
+                    @board.Id
+                </dd>
+                <dt>
+                    글제목
+                </dt>
+                <dd>
+                    @board.Title
+                </dd>
+                <dt>
+                    글내용
+                </dt>
+                <dd>
+                    @board.Comment
+                </dd>
+                <dt>
+                    작성자
+                </dt>
+                <dd>
+                    @board.UserId
+                </dd>
+                <dt>
+                    등록일
+                </dt>
+                <dd>
+                    @board.Regdate
+                </dd>
+            </dl>*@
 
-
-
-
-    <!--/////////////////////////////////////////////////////////////-->
-    <!-- Reply -->
-    <!--/////////////////////////////////////////////////////////////-->
-
-
-
-    <hr />
-    <input class="txt_Reply" placeholder="댓글을 입력해주세요." />   
-    <input type="button" class="btn btn-success" id="btn_ReplySave" value="저장" />
-
-    <br>
-    <br>
-
-    <!-- 이미지 파일만 선택가능 -->
-    <input type="file" id="file" accept='image/*'>
-    <img src="" id="image" height="100">
-    <script>
-        $("#file").on("change", function (e) {
-            var tmp = e.target.files[0];
-            var img = URL.createObjectURL(tmp);
-            $("#image").attr("src", img);
-        });
-    </script>
-
-    <br />
-    <br />
-
-    <!-- 댓글 리스트 -->
-    @*    <div class="reply-wrap">
-            <div class="reply-content">
-                <div class="reply-group">
-                </div>
-            </div>
-        </div>*@
-
-    <!-- 댓글 리스트 -->
-    @foreach (var item in comment)
-    {
-        <div class="reply-wrap">
-            @*<div class='reply-image'>
-                    <img src='@item.Image'>
-                </div>*@
-            <div class="reply-content">
-                <div class="reply-group">
-                    <strong>
-                        <a href="#" id="data_UserId" data-id="@item.Id" onclick="return ReplyMention(@item.Id, '@item.UserId')">
-                            @item.UserId
-                        </a>
-                    </strong>
-                    <small class="left">
-                        @item.Regdate
-                    </small>
-                    <button type="button" class="btn btn-primary" id="data_Reply" data-id="@item.Id" onclick="return EditComment(@item.Id, '@item.Comment')">
-                        <!-- data-id는 lowercase로 써줘야 가져올 수 있다. -->
-                        <span class="glyphicon glyphicon-pencil"></span>수정
-                    </button>
-                    <button type="button" class="btn btn-danger" onclick="return DeleteReply(@item.Id)">
-                        <span class="glyphicon glyphicon-remove"></span>삭제
-                    </button>
-                    <p class="clearfix" style="width:100px">@item.Comment</p>
-                </div>
-            </div>
+        <div>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>글제목</th>
+                        <th>글내용</th>
+                        <th>작성자</th>
+                        <th>등록일</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>@board.Id</td>
+                        <td>@board.Title</td>
+                        <td>@board.Comment</td>
+                        <td>@board.UserId</td>
+                        <td>@board.Regdate</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-    }
+    </div>
+        <!--/////////////////////////////////////////////////////////////-->
+        <!-- Reply -->
+        <!--/////////////////////////////////////////////////////////////-->
 
-<script>
+
+
+        <hr />
+        <input class="txt_Reply" placeholder="댓글을 입력해주세요." />
+        <input type="button" class="btn btn-success" id="btn_ReplySave" value="저장" />
+
+        <br>
+        <br>
+
+        <!-- 이미지 파일만 선택가능 -->
+        <input type="file" id="file" accept='image/*'>
+        <img src="" id="image" height="100">
+        <script>
+            $("#file").on("change", function (e) {
+                var tmp = e.target.files[0];
+                var img = URL.createObjectURL(tmp);
+                $("#image").attr("src", img);
+            });
+        </script>
+
+        <br />
+        <br />
+
+        <!-- 댓글 리스트 -->
+        @*    <div class="reply-wrap">
+                <div class="reply-content">
+                    <div class="reply-group">
+                    </div>
+                </div>
+            </div>*@
+
+        <!-- 댓글 리스트 -->
+        @foreach (var item in comment)
+        {
+            <div class="reply-wrap">
+                <div class="reply-content">
+                    <div class="reply-group">
+                        <strong>
+                            <a href="#" id="data_UserId" data-userid="@item.UserId" onclick="return ReplyMention(@item.Id, '@item.UserId')">
+                                @item.UserId
+                            </a>
+                        </strong>
+                        <small class="left">
+                            @item.Regdate
+                        </small>
+                        @if (@Session["UserId"].ToString() == @item.UserId)              
+                        {
+                            <button type="button" class="btn btn-primary" id="data_Reply" data-id="@item.Id" onclick="return EditComment(@item.Id, '@item.Comment')">
+                                <!-- data-id는 lowercase로 써줘야 가져올 수 있다. -->
+                                <span class="glyphicon glyphicon-pencil"></span>수정
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="return DeleteReply(@item.Id)">
+                                <span class="glyphicon glyphicon-remove"></span>삭제
+                            </button>
+                        }
+                        <p class="clearfix" style="width:100px">@item.Comment</p>
+                    </div>
+                </div>
+            </div>
+        }      
+
+        <script>
         @*$(document).ready(function () {
             getReplyList();
         });
@@ -151,25 +172,24 @@
 
         /* 해당 UserId 클릭시 입력창에 멘션(Mention) 됨 */
         function ReplyMention(_Id, _UserId) {
-                $(".txt_Reply").val("");
-                $(".txt_Reply").val("[" + _UserId + "] ").css("font-weight", "bold");
-                $(".txt_Reply").focus();
-                return false;
-            };
+            $(".txt_Reply").val("[" + _UserId + "] ").css("font-weight", "bold");
+            $(".txt_Reply").focus();
+            return false;
+        };
 
-            /* UserId 클릭하여 멘션(Mention)하면 입력창에 해당 UserId의 data가 들어감 */
-        $("#data_UserId").on("click", function () {       
-                $(".txt_Reply").data("Id", $(this).data("id"));
-                console.log($(this).data("id"));
-                return false;
-            });
+        /* UserId 클릭하여 멘션(Mention)하면 입력창에 해당 UserId의 data가 들어감 */
+        $("#data_UserId").on("click", function () {
+            //$(".txt_Reply").data("Id", $(this).data("id"));
+            $(".txt_Reply").data("Id", $(this).attr("data-userid"));
+            console.log($(this).data("userid"));
+            return false;
+        });
 
         /* "수정" 버튼 클릭시 Session 키를 체크하고 입력창에 해당 댓글이 보여짐 */
         @*function EditComment(_Id, _Comment, _UserId) {
             //console.log(_Id, _Comment, _UserId);
             if (_UserId = @Session["UserId"].ToString()) {
                 $(".txt_Reply").val(_Comment);
-                //$("#file").val(_Image);
                 $(".txt_Reply").focus();
             } else {
                 alert("작성자 본인만 댓글 수정이 가능합니다.");
@@ -181,7 +201,6 @@
         function EditComment(_Id, _Comment) {
             $(".txt_Reply").val(_Comment);
             //$(".txt_Reply").data("Id", $(this).data("id"));
-            //$("#file").val(_Image);
             $(".txt_Reply").focus();
             return false;
         };
@@ -197,24 +216,27 @@
         $("#btn_ReplySave").click(function () {
             //console.log($(".txt_Reply").data("Id"));
             var data = {
+                //Id: $(".txt_Reply").data("Id") == '0' ? '0' : $(".txt_Reply").data("Id"),
                 Id: $(".txt_Reply").data("Id") == undefined ? 0 : $(".txt_Reply").data("Id"),
                 ParentId: $(".txt_Reply").data("Id") == undefined ? undefined : $(".txt_Reply").data("Id"),
-                //TopId:
-                Lv: $(".txt_Reply").data("Id") == undefined ? 1 : $("txt_Reply").data("Id"),
+                TopId: $(".txt_Reply").data("Id"),
+                Lv: $(".txt_Reply").data("UserId") == undefined ? 1 : $("txt_Reply").data("Id"),
                 Comment: $(".txt_Reply").val()
-                //Image: $("#file").val()
             }
             $.ajax({
                 type: "POST",
                 url: "/Board/ReplyUpdate",
                 data: data,
                 success: function () {
-                    if ($(".txt_Reply").data("Id") == undefined) {
+                    if ($(".txt_Reply").data("Id") == undefined || $(".txt_Reply").data("userid") == undefined) {
                         alert("신규 저장 완료");
+                    } else if ($(".txt_Reply").data("UserId") != undefined) {
+                        alert("댓글 등록 완료");
                     } else {
                         alert("수정 완료");
                     }
                     window.location.reload();
+                    //getReplyList();
                 }
             })
         });
@@ -229,8 +251,9 @@
                 success: function () {
                     alert("삭제 완료!!");
                     window.location.reload();
+                    //getReplyList();
                 }
             })
         };
-</script>
-</div>
+        </script>
+    </div>

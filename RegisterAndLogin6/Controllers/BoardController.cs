@@ -195,14 +195,14 @@ namespace RegisterAndLogin6.Controllers
         }
 
         /* 댓글 ReplyUpdate */
-        public JsonResult ReplyUpdate(int Id, string ParentId, int Lv, string Comment)
+        public JsonResult ReplyUpdate(int Id, string ParentId, string TopId, string Lv, string Comment)
         {
             using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
             {
                 if (Id == 0) // Insert (신규 저장 완료)
                 {
                     //return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentListWithCTE_Insert", new { Id = Id, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure));
-                    return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Insert", new { Id = Id, ParentId = ParentId, TopId = Id, Lv = Lv, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure));
+                    return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Insert", new { Id = Id, ParentId = ParentId, TopId = TopId, Lv = Lv, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure));
                 }
                 else // Update (수정 완료)
                 {

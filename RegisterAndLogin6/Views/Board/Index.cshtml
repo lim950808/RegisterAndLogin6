@@ -2,6 +2,7 @@
     ViewBag.Title = "SrookPay 자유게시판";
     List<RegisterAndLogin6.Models.Board> boardIndex = ViewBag.boardIndex as List<RegisterAndLogin6.Models.Board>;
 }
+@*@model IEnumerable<RegistrationAndLogin7.Models.Board>*@
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,7 +16,7 @@
     <p>
         @Html.ActionLink("글 작성", "Create")
     </p>
-    <table class="table">
+    <table class="table table-striped">
         <tr>
             <th>
                 No
@@ -47,9 +48,12 @@
                     @item.Regdate
                 </td>
                 <td>
-                    @Html.ActionLink("자세히", "Details", new { id = item.Id }) |
-                    @Html.ActionLink("수정", "Edit", new { id = item.Id }) |
-                    @Html.ActionLink("삭제", "Delete", new { id = item.Id })
+                    @Html.ActionLink("자세히", "Details", new { id = item.Id })
+                    @if (@Session["UserId"].ToString() == @item.UserId)
+                    {
+                        @Html.ActionLink("수정", "Edit", new { id = item.Id })
+                        @Html.ActionLink("삭제", "Delete", new { id = item.Id })
+                    }
                 </td>
             </tr>
 
