@@ -55,7 +55,7 @@ namespace RegisterAndLogin6.Controllers
         }*/
 
         // GET: Board/Details/
-        public ActionResult Details(int Id, string ParentId, string Lv, string Comment)
+        public ActionResult Details(int Id, string ParentId, string TopId, string Lv, string Comment)
         {
             if (Session["UserId"] != null)
             {
@@ -63,8 +63,8 @@ namespace RegisterAndLogin6.Controllers
                 {
                     ViewBag.Board = db.Query<Board>("SELECT * FROM Board WHERE Id =" + Id + "ORDER BY Id DESC", new { Id }).SingleOrDefault();
                     //ViewBag.comment = db.Query<CommentList>("SELECT * FROM CommentList (nolock) ORDER BY Id DESC").ToList();
-                    //ViewBag.comment = db.Query<CommentList>("sp_SPA_CommentList_Select", new { Id = Id, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure).ToList();
-                    ViewBag.comment = db.Query<CommentList>("sp_SPA_CommentListWithCTE_Select", new { Id = Id, ParentId = ParentId, TopId = Id, Lv = Lv, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure).ToList();
+                    ViewBag.comment = db.Query<CommentList>("sp_SPA_CommentList_Select", new { Id = Id, ParentId = ParentId, TopId = TopId, Lv = Lv, Comment = Comment, UserId = Session["UserId"].ToString(), Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure).ToList();
+                    //ViewBag.comment = db.Query<CommentList>("sp_SPA_CommentListWithCTE_Select", new { Id = Id, ParentId = ParentId, TopId = Id, Lv = Lv, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure).ToList();
                 }
                 return View();
             }
@@ -207,7 +207,7 @@ namespace RegisterAndLogin6.Controllers
                 else // Update (수정 완료)
                 {
                     //return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentListWithCTE_Update", new { Id = Id, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure));
-                    return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Update", new { Id = Id, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure));
+                    return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Update", new { Id = Id, Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure));
                 }
             }
         }

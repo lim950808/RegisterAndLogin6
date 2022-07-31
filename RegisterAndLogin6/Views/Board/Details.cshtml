@@ -77,72 +77,72 @@
             </table>
         </div>
     </div>
-        <!--/////////////////////////////////////////////////////////////-->
-        <!-- Reply -->
-        <!--/////////////////////////////////////////////////////////////-->
+    <!--/////////////////////////////////////////////////////////////-->
+    <!-- Reply -->
+    <!--/////////////////////////////////////////////////////////////-->
 
 
 
-        <hr />
-        <input class="txt_Reply" placeholder="댓글을 입력해주세요." />
-        <input type="button" class="btn btn-success" id="btn_ReplySave" value="저장" />
+    <hr />
+    <input class="txt_Reply" placeholder="댓글을 입력해주세요." />
+    <input type="button" class="btn btn-success" id="btn_ReplySave" value="저장" />
 
-        <br>
-        <br>
+    <br>
+    <br>
 
-        <!-- 이미지 파일만 선택가능 -->
-        <input type="file" id="file" accept='image/*'>
-        <img src="" id="image" height="100">
-        <script>
-            $("#file").on("change", function (e) {
-                var tmp = e.target.files[0];
-                var img = URL.createObjectURL(tmp);
-                $("#image").attr("src", img);
-            });
-        </script>
+    <!-- 이미지 파일만 선택가능 -->
+    <input type="file" id="file" accept='image/*'>
+    <img src="" id="image" height="100">
+    <script>
+        $("#file").on("change", function (e) {
+            var tmp = e.target.files[0];
+            var img = URL.createObjectURL(tmp);
+            $("#image").attr("src", img);
+        });
+    </script>
 
-        <br />
-        <br />
+    <br />
+    <br />
 
-        <!-- 댓글 리스트 -->
-        @*    <div class="reply-wrap">
-                <div class="reply-content">
-                    <div class="reply-group">
-                    </div>
-                </div>
-            </div>*@
-
-        <!-- 댓글 리스트 -->
-        @foreach (var item in comment)
-        {
-            <div class="reply-wrap">
-                <div class="reply-content">
-                    <div class="reply-group">
-                        <strong>
-                            <a href="#" id="data_UserId" data-userid="@item.UserId" onclick="return ReplyMention(@item.Id, '@item.UserId')">
-                                @item.UserId
-                            </a>
-                        </strong>
-                        <small class="left">
-                            @item.Regdate
-                        </small>
-                        @if (@Session["UserId"].ToString() == @item.UserId)              
-                        {
-                            <button type="button" class="btn btn-primary" id="data_Reply" data-id="@item.Id" onclick="return EditComment(@item.Id, '@item.Comment')">
-                                <!-- data-id는 lowercase로 써줘야 가져올 수 있다. -->
-                                <span class="glyphicon glyphicon-pencil"></span>수정
-                            </button>
-                            <button type="button" class="btn btn-danger" onclick="return DeleteReply(@item.Id)">
-                                <span class="glyphicon glyphicon-remove"></span>삭제
-                            </button>
-                        }
-                        <p class="clearfix" style="width:100px">@item.Comment</p>
-                    </div>
+    <!-- 댓글 리스트 -->
+    @*    <div class="reply-wrap">
+            <div class="reply-content">
+                <div class="reply-group">
                 </div>
             </div>
-        }      
+        </div>*@
 
-        <script>
+    <!-- 댓글 리스트 -->
+    @foreach (var item in comment)
+    {
+        <div class="reply-wrap">
+            <div class="reply-content">
+                <div class="reply-group">
+                    <strong>
+                        <a href="#" id="data_UserId" data-userid="@item.UserId" onclick="return ReplyMention(@item.Id, '@item.UserId')">
+                            @item.UserId
+                        </a>
+                    </strong>
+                    <small class="left">
+                        @item.Regdate
+                    </small>
+                    @if (@Session["UserId"].ToString() == @item.UserId)
+                    {
+                        <button type="button" class="btn btn-primary" id="data_Reply" data-id="@item.Id" onclick="return EditComment(@item.Id, '@item.Comment')">
+                            <!-- data-id는 lowercase로 써줘야 가져올 수 있다. -->
+                            <span class="glyphicon glyphicon-pencil"></span>수정
+                        </button>
+                        <button type="button" class="btn btn-danger" onclick="return DeleteReply(@item.Id)">
+                            <span class="glyphicon glyphicon-remove"></span>삭제
+                        </button>
+                    }
+                    <p class="clearfix" style="width:100px">@item.Comment</p>
+                </div>
+            </div>
+        </div>
+    }
+
+    <script>
         @*$(document).ready(function () {
             getReplyList();
         });
@@ -220,7 +220,7 @@
                 Id: $(".txt_Reply").data("Id") == undefined ? 0 : $(".txt_Reply").data("Id"),
                 ParentId: $(".txt_Reply").data("Id") == undefined ? undefined : $(".txt_Reply").data("Id"),
                 TopId: $(".txt_Reply").data("Id"),
-                Lv: $(".txt_Reply").data("UserId") == undefined ? 1 : $("txt_Reply").data("Id"),
+                Lv: $(".txt_Reply").data("UserId") == undefined ? 1 : $("txt_Reply").data("Id")+1,
                 Comment: $(".txt_Reply").val()
             }
             $.ajax({
@@ -255,5 +255,5 @@
                 }
             })
         };
-        </script>
-    </div>
+    </script>
+</div>
