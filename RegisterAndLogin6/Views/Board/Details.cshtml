@@ -75,6 +75,39 @@
                     </tr>
                 </tbody>
             </table>
+
+            @*<table class="table table-striped table-bordered">
+
+                    <tr>
+                        <th>작성자</th>
+                        <td>@board.UserId</td>
+                        <th>No</th>
+                        <td>@board.Id</td>
+                    </tr>
+                    <tr>
+                        <th style="padding-bottom: 15px;">글제목</th>
+                        <th>등록일</th>
+                        <td>@board.Regdate</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="text" name="title" value="[Re]&nbsp;"
+                                   class="form-control" aria-describedby="basic-addon1">
+                        </td>
+                    </tr>
+
+                    <tbody>
+                        <tr>
+                            <td colspan="2">
+                                <textarea class="form-control" rows="10" name="content" placeholder="글을 적어 주세요."></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th style="padding-top: 15px">첨부파일</th>
+                            <td><input type="file" class="btn btn-default" name="fileName" accept='image/*'></td>
+                        </tr>
+                    </tbody>
+                </table>*@
         </div>
     </div>
     <!--/////////////////////////////////////////////////////////////-->
@@ -86,19 +119,36 @@
     <hr />
     <input class="txt_Reply" placeholder="댓글을 입력해주세요." />
     <input type="button" class="btn btn-success" id="btn_ReplySave" value="저장" />
+    @*<input type="file" class="btn btn-default" name="fileName" accept='image/*'>*@
 
-    <br>
-    <br>
+    <!-- 이미지 파일만 업로드 -->
+    @*<input type="file" id="file" accept='image/*'>
+        <img src="" id="image" height="100">
+        <script>
+            $("#file").on("change", function (e) {
+                var tmp = e.target.files[0];
+                var img = URL.createObjectURL(tmp);
+                $("#image").attr("src", img);
+            });
+        </script>*@
 
-    <!-- 이미지 파일만 선택가능 -->
-    <input type="file" id="file" accept='image/*'>
-    <img src="" id="image" height="100">
+    <!-- 이미지 파일 업로드 test1 -->
+    <input type="file" id="file" accept='image/*' />
+    <img src="" id="image" height="100" />
     <script>
-        $("#file").on("change", function (e) {
-            var tmp = e.target.files[0];
-            var img = URL.createObjectURL(tmp);
-            $("#image").attr("src", img);
+        $('#file').change(function () {
+            setImageFromFile(this, '#image');
         });
+
+        function setImageFromFile(input, expression) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $(expression).attr('src', e.target.result);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
     </script>
 
     <br />
@@ -119,7 +169,7 @@
             <div class="reply-content">
                 <div class="reply-group">
                     <strong>
-                        <a href="#" id="data_UserId" data-userid="@item.UserId" onclick="return ReplyMention(@item.Id, '@item.UserId')">
+                        <a href="#" id="data_UserId" data-userid="@item.Id" data-id="@item.Id" onclick="return ReplyMention(@item.Id, '@item.UserId')">
                             @item.UserId
                         </a>
                     </strong>
@@ -136,7 +186,23 @@
                             <span class="glyphicon glyphicon-remove"></span>삭제
                         </button>
                     }
-                    <p class="clearfix" style="width:100px">@item.Comment</p>
+                    <p style="width:100px">
+                        @for (int i = 0; i < @item.Lv; i++)
+                        {
+                            <span>&nbsp;&nbsp;&nbsp;</span>
+                        }
+                        @item.Comment
+                    </p>
+                    @if (item.Image != null)
+                    {
+                        @*<img height="100">
+                            @item.Image*@
+                        <img src="@item.Image" height="100">
+                        @*<img src="" id="image" height="100">
+                            <script>
+                                $("#image").attr("src", @item.Image);
+                            </script>*@
+                    }
                 </div>
             </div>
         </div>
@@ -179,8 +245,10 @@
 
         /* UserId 클릭하여 멘션(Mention)하면 입력창에 해당 UserId의 data가 들어감 */
         $("#data_UserId").on("click", function () {
-            //$(".txt_Reply").data("Id", $(this).data("id"));
-            $(".txt_Reply").data("Id", $(this).attr("data-userid"));
+            $(".txt_Reply").data("Id", $(this).data("id"));
+            $(".txt_Reply").data("UserId", $(this).data("userid"));
+            //$(".txt_Reply").data("UserId", $(this).attr("data-userid"));
+            console.log($(this).data("id"));
             console.log($(this).data("userid"));
             return false;
         });
@@ -220,15 +288,17 @@
                 Id: $(".txt_Reply").data("Id") == undefined ? 0 : $(".txt_Reply").data("Id"),
                 ParentId: $(".txt_Reply").data("Id") == undefined ? undefined : $(".txt_Reply").data("Id"),
                 TopId: $(".txt_Reply").data("Id"),
-                Lv: $(".txt_Reply").data("UserId") == undefined ? 1 : $("txt_Reply").data("Id")+1,
-                Comment: $(".txt_Reply").val()
+                Lv: $(".txt_Reply").data("id") == undefined ? 1 : $("txt_Reply").data("Id"),
+                Comment: $(".txt_Reply").val(),
+                Image: $("#file").val()
             }
             $.ajax({
                 type: "POST",
                 url: "/Board/ReplyUpdate",
                 data: data,
                 success: function () {
-                    if ($(".txt_Reply").data("Id") == undefined || $(".txt_Reply").data("userid") == undefined) {
+                    //if ($(".txt_Reply").data("Id") == undefined) {
+                    if ($(".txt_Reply").data("Id") == undefined) {
                         alert("신규 저장 완료");
                     } else if ($(".txt_Reply").data("UserId") != undefined) {
                         alert("댓글 등록 완료");

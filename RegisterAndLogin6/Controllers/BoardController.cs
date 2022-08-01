@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -55,7 +56,7 @@ namespace RegisterAndLogin6.Controllers
         }*/
 
         // GET: Board/Details/
-        public ActionResult Details(int Id, string ParentId, string TopId, string Lv, string Comment)
+        public ActionResult Details(int Id, string ParentId, string TopId, string Lv, string Comment, string Image)
         {
             if (Session["UserId"] != null)
             {
@@ -63,7 +64,7 @@ namespace RegisterAndLogin6.Controllers
                 {
                     ViewBag.Board = db.Query<Board>("SELECT * FROM Board WHERE Id =" + Id + "ORDER BY Id DESC", new { Id }).SingleOrDefault();
                     //ViewBag.comment = db.Query<CommentList>("SELECT * FROM CommentList (nolock) ORDER BY Id DESC").ToList();
-                    ViewBag.comment = db.Query<CommentList>("sp_SPA_CommentList_Select", new { Id = Id, ParentId = ParentId, TopId = TopId, Lv = Lv, Comment = Comment, UserId = Session["UserId"].ToString(), Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure).ToList();
+                    ViewBag.comment = db.Query<CommentList>("sp_SPA_CommentList_Select", new { Id = Id, ParentId = ParentId, TopId = TopId, Lv = Lv, Comment = Comment, Image = Image, UserId = Session["UserId"].ToString(), Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure).ToList();
                     //ViewBag.comment = db.Query<CommentList>("sp_SPA_CommentListWithCTE_Select", new { Id = Id, ParentId = ParentId, TopId = Id, Lv = Lv, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure).ToList();
                 }
                 return View();
@@ -195,19 +196,23 @@ namespace RegisterAndLogin6.Controllers
         }
 
         /* 댓글 ReplyUpdate */
-        public JsonResult ReplyUpdate(int Id, string ParentId, string TopId, string Lv, string Comment)
+        public JsonResult ReplyUpdate(int Id, string ParentId, string TopId, int Lv, string Comment, string Image)
         {
             using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
             {
-                if (Id == 0) // Insert (신규 저장 완료)
+                if (Id == 0 && ParentId == null) // Insert (신규 저장 완료)
                 {
                     //return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentListWithCTE_Insert", new { Id = Id, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure));
-                    return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Insert", new { Id = Id, ParentId = ParentId, TopId = TopId, Lv = Lv, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure));
+                    return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Insert", new { Id = Id, ParentId = ParentId, TopId = TopId, Lv = Lv, UserId = Session["UserId"].ToString(), Comment = Comment, Image = Image, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure));
+                }
+                else if (Id != 0 && ParentId != null) // Insert (댓글 등록 완료)
+                {
+                    return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Insert", new { Id = Id, ParentId = ParentId, TopId = TopId, Lv = Lv, UserId = Session["UserId"].ToString(), Comment = Comment, Image = Image, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure));
                 }
                 else // Update (수정 완료)
                 {
                     //return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentListWithCTE_Update", new { Id = Id, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure));
-                    return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Update", new { Id = Id, Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure));
+                    return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Update", new { Id = Id, Comment = Comment, Image = Image, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure));
                 }
             }
         }
@@ -221,5 +226,24 @@ namespace RegisterAndLogin6.Controllers
                 return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Delete", new { Id = Id }, null, true, null, System.Data.CommandType.StoredProcedure));
             }
         }
+
+        /* 이미지 파일 업로드 */
+        /*[HttpPost]
+        public ActionResult Upload(IEnumerable<CommentList> commentlist)
+        {
+            if (ModelState.IsValid)
+            {
+                foreach (var file in commentlist)
+                {
+                    if (file.ContentLength > 0)
+                    {
+                        var fileName = Path.GetFileName(file.Image);
+                        var path = Path.Combine(Server.MapPath("~/image"), fileName);
+                        file.SaveAs(path);
+                    }
+                }
+            }
+            return RedirectToAction("Index");
+        }*/
     }
 }
