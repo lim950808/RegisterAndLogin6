@@ -121,10 +121,10 @@
     <input type="button" class="btn btn-success" id="btn_ReplySave" value="저장" />
     @*<input type="file" class="btn btn-default" name="fileName" accept='image/*'>*@
 
-    <!-- 이미지 파일만 업로드 -->
-    @*<input type="file" id="file" accept='image/*'>
-        <img src="" id="image" height="100">
-        <script>
+    <!-- 이미지 파일만 업로드 test1 -->
+    <input type="file" id="file" accept='image/*'>
+    <img src="" id="image" height="100">
+    @*<script>
             $("#file").on("change", function (e) {
                 var tmp = e.target.files[0];
                 var img = URL.createObjectURL(tmp);
@@ -132,24 +132,68 @@
             });
         </script>*@
 
-    <!-- 이미지 파일 업로드 test1 -->
-    <input type="file" id="file" accept='image/*' />
-    <img src="" id="image" height="100" />
-    <script>
-        $('#file').change(function () {
-            setImageFromFile(this, '#image');
-        });
+    <!-- 이미지 파일 업로드 test2 -->
+    @*<input type="file" id="file" accept='image/*' />
+        <img src="" id="image" height="100" />
+        <script>
+            $('#file').change(function () {
+                setImageFromFile(this, '#image');
+            });
 
-        function setImageFromFile(input, expression) {
-            if (input.files && input.files[0]) {
+            function setImageFromFile(input, expression) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $(expression).attr('src', e.target.result);
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+        </script>*@
+
+    <!-- 이미지 파일 업로드 test3 -->
+    @*<form action="Upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" id="file" accept='image/*' />
+            <input type="submit" value="제출!" />
+        </form>*@
+
+    <!-- 이미지 파일 업로드 test4 -->
+    @*<input type="file" id="file" accept='image/*' onchange="javascript: readURL(this);" />
+        <img src="" id="image" height="100" />
+        <script>
+            $('#file').change(function () {
+                setImageFromFile(this, '#image');
+            });
+
+            function setImageFromFile(image) {
                 var reader = new FileReader();
                 reader.onload = function (e) {
-                    $(expression).attr('src', e.target.result);
+                    $(image).attr('src', e.target.result);
                 }
-                reader.readAsDataURL(input.files[0]);
+                reader.readAsDataURL(file);
             }
-        }
-    </script>
+        </script>*@
+
+    <!-- 이미지 파일 업로드 test5 -->
+    @*@using (Html.BeginForm("UploadFile", "Board", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            <input type="file" name="file" id="file" style="width: 100%;" />
+            <input type="submit" value="Upload" class="submit" />
+        }*@
+
+    <!-- 이미지 파일 업로드 test6 -->
+    <!--<form action="UploadFile" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" id="file" accept='image/*' />
+        <input type="submit" value="업로드" class="submit" />-->
+    @*        <img src="" id="image" height="100">
+        <script>
+            $("#file").on("change", function (e) {
+                var tmp = e.target.files[0];
+                var img = URL.createObjectURL(tmp);
+                $("#image").attr("src", img);
+            });
+        </script>*@
+    <!--</form>-->
 
     <br />
     <br />
@@ -197,6 +241,7 @@
                     {
                         @*<img height="100">
                             @item.Image*@
+                        @*<img src="file:///C://Users/Srook/@item.Image" height="100">*@
                         <img src="@item.Image" height="100">
                         @*<img src="" id="image" height="100">
                             <script>
@@ -282,7 +327,6 @@
 
         /* "저장" 버튼 클릭시 댓글 Insert or Update */
         $("#btn_ReplySave").click(function () {
-            //console.log($(".txt_Reply").data("Id"));
             var data = {
                 //Id: $(".txt_Reply").data("Id") == '0' ? '0' : $(".txt_Reply").data("Id"),
                 Id: $(".txt_Reply").data("Id") == undefined ? 0 : $(".txt_Reply").data("Id"),
@@ -290,7 +334,7 @@
                 TopId: $(".txt_Reply").data("Id"),
                 Lv: $(".txt_Reply").data("id") == undefined ? 1 : $("txt_Reply").data("Id"),
                 Comment: $(".txt_Reply").val(),
-                Image: $("#file").val()
+                Image: $("#file").val() == "" ? undefined : $("#file").val()
             }
             $.ajax({
                 type: "POST",
@@ -311,7 +355,6 @@
             })
         });
 
-
         /* 댓글 Delete */
         var DeleteReply = function (_Id) {
             $.ajax({
@@ -325,5 +368,19 @@
                 }
             })
         };
+
+        /* 이미지 파일 주소 불러오기 */
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader(); //파일을 읽기 위한 FileReader 객체 생성
+                reader.onload = function (e) {
+                    //파일 읽기를 성공했을때 호출되는 이벤트 핸들러
+                    $("#file").attr('src', e.target.result);
+                    //이미지 Tag의 src속성에 읽어들인 File 내용을 지정
+                }
+                reader.readAsDataURL(input.files[0]);
+                //File 내용을 읽어 dataURL 형식의 문자열로 저장
+            }
+        }
     </script>
 </div>

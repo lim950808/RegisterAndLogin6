@@ -229,21 +229,103 @@ namespace RegisterAndLogin6.Controllers
 
         /* 이미지 파일 업로드 */
         /*[HttpPost]
-        public ActionResult Upload(IEnumerable<CommentList> commentlist)
+        public ActionResult UploadFile(HttpPostedFileBase file)
+        {
+            try
+            {
+                if (file.ContentLength > 0)
+                {
+                    string _FileName = Path.GetFileName(file.FileName);
+                    string _path = Path.Combine(Server.MapPath("~/image"), _FileName);
+                    file.SaveAs(_path);
+                }
+                ViewBag.Message = "File Uploaded Successfully!!";
+                return RedirectToAction("Details");
+            }
+            catch
+            {
+                ViewBag.Message = "File upload failed!!";
+                return RedirectToAction("Details");
+            }
+        }*/
+
+        /*[HttpPost]
+        public ActionResult UploadFile(HttpPostedFileBase file)
+        {
+            if (file.ContentLength > 0)
+            {
+                string _FileName = Path.GetFileName(file.FileName);
+                string _path = Path.Combine(Server.MapPath("~/image"), _FileName);
+                file.SaveAs(_path);
+            }
+            return View();
+        }*/
+
+        /* 이미지 파일 업로드 */
+        /*[HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Upload(HttpPostedFileBase file)
+        {
+            var fileName = string.Empty;
+            var model = new JsonResultModel();
+            if ((file != null) && (file.ContentLength > 0) && !string.IsNullOrEmpty(file.FileName))
+            {
+                fileName = file.FileName;
+                string fileContentType = file.ContentType;
+                byte[] fileBytes = new byte[file.ContentLength];
+                var data = file.InputStream.Read(fileBytes, 0, Convert.ToInt32(file.ContentLength));
+            }
+            return Json(model, JsonRequestBehavior.AllowGet);
+        }*/
+
+        /*[HttpPost]
+        public ActionResult Upload(HttpPostedFileBase file)
         {
             if (ModelState.IsValid)
             {
-                foreach (var file in commentlist)
+                if (file.ContentLength > 0)
                 {
-                    if (file.ContentLength > 0)
-                    {
-                        var fileName = Path.GetFileName(file.Image);
-                        var path = Path.Combine(Server.MapPath("~/image"), fileName);
-                        file.SaveAs(path);
-                    }
+                    var fileName = Path.GetFileName(file.FileName);
+                    var path = Path.Combine(Server.MapPath("~/image/"), fileName);
+                    file.SaveAs(path);
                 }
             }
-            return RedirectToAction("Index");
+            return RedirectToAction("Details", "Board");
+        }*/
+
+        /*public ActionResult FileUpload(HttpPostedFileBase file)
+        {
+            if (file != null)
+            {
+                try
+                {
+                    HttpFileCollection hfc = HttpContext.Current.Request.Files;
+                    string path = "/image/";
+                    for (int i = 0; i < hfc.Count; i++)
+                    {
+                        HttpPostedFile hpf = hfc[i];
+                        if (hpf.ContentLength > 0)
+                        {
+                            string fileName = "";
+                            if (Request.Browser.Browser == "IE")
+                            {
+                                fileName = Path.GetFileName(hpf.FileName);
+                            }
+                            else
+                            {
+                                fileName = hpf.FileName;
+                            }
+                            string fullPathWithFileName = path + fileName;
+                            hpf.SaveAs(Server.MapPath(fullPathWithFileName));
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            return RedirectToAction("Details", "Board");
         }*/
     }
 }
