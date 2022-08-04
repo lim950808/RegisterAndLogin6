@@ -38,6 +38,7 @@ CREATE TABLE [dbo].[CommentList]<br>
 	[ParentId] [nvarchar](50) NULL,<br>
 	[Lv] int NULL,<br>
 	[Comment] [nvarchar](500) NULL,<br>
+	[Image] [nvarchar](500) NULL,<br>
 	[UserId] [nvarchar](50) NULL,<br>
 	[Regdate] [datetime] NULL,<br>
   	CONSTRAINT [PK_Board_1] PRIMARY KEY CLUSTERED <br>
@@ -86,4 +87,81 @@ SELECT <br>
 	Regdate<br>
 FROM CTE<br>
 ORDER BY Depth<br>
+;<br>
+<pre>
+
+</pre>
+<hr>
+<h2>CommentList 관련 Stored Procedures</h2>
+Create Procedure [dbo].[sp_SPA_CommentList_Select]  <br>
+	(<br>
+		@Id			int,<br>
+		@ParentId	nvarchar(50),<br>
+		@TopId		int,<br>
+		@Lv			int,<br>
+		@Comment	nvarchar(500),<br>
+		@UserId		nvarchar(50),<br>
+		@Image		nvarchar(500),<br>
+		@Regdate	datetime<br>
+	)<br>
+as     <br>
+Begin    <br>
+	SELECT <br>
+		Id, ParentId, TopId, Lv, Comment, Image, UserId, Regdate<br>
+	FROM <br>
+		CommentList<br>
+	(nolock)<br>
+	ORDER BY Id DESC; <br>
+End  <br>
+;<br>
+<hr>
+Create Procedure [dbo].[sp_SPA_CommentList_Insert] <br>
+	(<br>
+	 @Id		int,<br>
+	 @ParentId	nvarchar(50),<br>
+	 @TopId		int,<br>
+	 @Lv		int,<br>
+	 @UserId	nvarchar(50),<br>
+	 @Comment	nvarchar(500),<br>
+	 @Image		nvarchar(500),<br>
+	 @Regdate	datetime<br>
+	)<br>
+as     <br>
+Begin    <br>
+	INSERT INTO CommentList <br>
+		(ParentId, TopId, Lv, Comment, UserId, Image, Regdate) <br>
+	Values <br>
+		(@ParentId, @TopId, @Lv, @Comment, @UserId, @Image, Getdate())<br>
+End  <br>
+;<br>
+<hr>
+Create Procedure [dbo].[sp_SPA_CommentList_Update] <br>
+	(<br>
+	 @Id		int,<br>
+	 @Comment	nvarchar(500),<br>
+	 @Image		nvarchar(500),<br>
+	 @Regdate	datetime<br>
+	)<br>
+as     <br>
+Begin    <br>
+	Update <br>
+		CommentList <br>
+	Set<br>
+		Comment = @Comment,<br>
+		Image = @Image,<br>
+		Regdate = GETDATE()<br>
+	Where<br>
+		Id = @Id<br>
+End  <br>
+;<br>
+<hr>
+Create Procedure [dbo].[sp_SPA_CommentList_Delete] <br>
+	@Id	int<br>
+as     <br>
+Begin    <br>
+	Delete From <br>
+		CommentList <br>
+	Where<br>
+		Id = @Id OR TopId = @Id<br>
+End  <br>
 ;<br>
