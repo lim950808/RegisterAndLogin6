@@ -14,7 +14,31 @@
     } *@
 
 <form action="UploadFile" method="post" enctype="multipart/form-data">
+    <hr />
     <input type="file" name="file" id="file" accept='image/*' />
-    <input type="submit" value="Upload" class="submit" />
+    <br />
+    <input type="submit" value="Upload" class="btn btn-primary" />
     @ViewBag.Message
 </form>
+
+@*<input type="file" name="file" id="file" accept='image/*' />
+    <br />
+    <input type="button" id="btn_Upload" value="Upload" class="btn btn-primary" />*@
+@*<input type="submit" id="btn_Upload" value="Upload" class="btn btn-primary" />*@
+
+<!--<script>
+    $("#btn_Upload").click(function () {-->
+@*var data = {
+
+    }*@
+<!--$.ajax({
+            type: "POST",
+            url: "/Upload/UploadFile",
+            //data: data,
+            success: function () {
+                alert("업로드 성공!!");
+            }
+
+        })
+    });
+</script>-->

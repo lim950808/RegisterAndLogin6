@@ -196,14 +196,16 @@ namespace RegisterAndLogin6.Controllers
         }
 
         /* 댓글 ReplyUpdate */
+        [HttpPost]
         public JsonResult ReplyUpdate(int Id, string ParentId, string TopId, int Lv, string Comment, string Image)
         {
             using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
             {
                 if (Id == 0 && ParentId == null) // Insert (신규 저장 완료)
                 {
-                    //return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentListWithCTE_Insert", new { Id = Id, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure));
-                    return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Insert", new { Id = Id, ParentId = ParentId, TopId = TopId, Lv = Lv, UserId = Session["UserId"].ToString(), Comment = Comment, Image = Image, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure));
+                    //return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentListWithCTE_Insert", new { Id = Id, UserId = Session["UserId"].ToString(), Comment = Comment, Regdate = DateTime.Now }, null, true, null, System.Data.CommandType.StoredProcedure));           
+                    object paramss = new { Id = Id, ParentId = ParentId, TopId = TopId, Lv = Lv, UserId = Session["UserId"].ToString(), Comment = Comment, Image = Image, Regdate = DateTime.Now };
+                    return Json(db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_Insert", paramss, null, true, null, System.Data.CommandType.StoredProcedure));
                 }
                 else if (Id != 0 && ParentId != null) // Insert (댓글 등록 완료)
                 {
@@ -324,6 +326,18 @@ namespace RegisterAndLogin6.Controllers
                 {
                     throw ex;
                 }
+            }
+            return RedirectToAction("Details", "Board");
+        }*/
+
+        /*[HttpPost]
+        public ActionResult UploadFile(HttpPostedFileBase file)
+        {
+            if (file.ContentLength > 0)
+            {
+                var fileName = Path.GetFileName(file.FileName);
+                var path = Path.Combine(Server.MapPath("~/image"), fileName);
+                file.SaveAs(path);
             }
             return RedirectToAction("Details", "Board");
         }*/

@@ -118,20 +118,27 @@
 
     <hr />
     <input class="txt_Reply" placeholder="댓글을 입력해주세요." />
+
     <input type="button" class="btn btn-success" id="btn_ReplySave" value="저장" />
     @*<input type="file" class="btn btn-default" name="fileName" accept='image/*'>*@
 
     <!-- 이미지 파일만 업로드 test1 -->
     <input type="file" id="file" accept='image/*'>
     <img src="" id="image" height="100">
-    @*<script>
-            $("#file").on("change", function (e) {
-                var tmp = e.target.files[0];
-                var img = URL.createObjectURL(tmp);
-                $("#image").attr("src", img);
-            });
-        </script>*@
+    <script>
+        $("#file").on("change", function (e) {
+            var tmp = e.target.files[0];
+            var img = URL.createObjectURL(tmp);
+            $("#image").attr("src", img);
+        });
+    </script>
 
+    <!--<form action="ReplyUpdate" method="post" enctype="multipart/form-data">
+        <hr />
+        <input type="file" name="file" id="file" accept='image/*' />
+        <br />-->
+    @* <input type="submit" value="Upload" class="btn btn-primary" />*@
+    <!--</form>-->
     <!-- 이미지 파일 업로드 test2 -->
     @*<input type="file" id="file" accept='image/*' />
         <img src="" id="image" height="100" />
