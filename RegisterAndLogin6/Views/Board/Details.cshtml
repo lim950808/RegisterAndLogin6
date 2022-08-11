@@ -7,7 +7,7 @@
     ViewBag.Title = "Details";
 }
 <script src="~/Scripts/jquery-3.6.0.min.js"></script>
-<h2>Details</h2>
+<h2>자세히</h2>
 
 <p>
     @Html.ActionLink("뒤로가기", "Index")
@@ -18,127 +18,56 @@
     @*@Html.ActionLink("삭제", "Delete", new { id = Model.Id })*@
     @Html.ActionLink("Delete", "Board", new { Id = board.Id })
 </p>
+<hr />
 <div>
     <div class="row">
-        <hr />
-        @*<dl class="dl-horizontal">
-                <dt>
-                    No
-                </dt>
-                <dd>
-                    @board.Id
-                </dd>
-                <dt>
-                    글제목
-                </dt>
-                <dd>
-                    @board.Title
-                </dd>
-                <dt>
-                    글내용
-                </dt>
-                <dd>
-                    @board.Comment
-                </dd>
-                <dt>
-                    작성자
-                </dt>
-                <dd>
-                    @board.UserId
-                </dd>
-                <dt>
-                    등록일
-                </dt>
-                <dd>
-                    @board.Regdate
-                </dd>
-            </dl>*@
-
         <div>
+            <h1>@board.Title</h1>
             <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>글제목</th>
-                        <th>글내용</th>
-                        <th>작성자</th>
-                        <th>등록일</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>@board.Id</td>
-                        <td>@board.Title</td>
-                        <td>@board.Comment</td>
-                        <td>@board.UserId</td>
-                        <td>@board.Regdate</td>
-                    </tr>
-                </tbody>
+                <tr>
+                    <th>No</th>
+                    <th>글내용</th>
+                    <th>작성자</th>
+                    <th>등록일</th>
+                </tr>
+                <tr>
+                    <td>@board.Id</td>
+                    <td>@board.Comment</td>
+                    <td>@board.UserId</td>
+                    <td>@board.Regdate</td>
+                </tr>
             </table>
-
-            @*<table class="table table-striped table-bordered">
-
-                    <tr>
-                        <th>작성자</th>
-                        <td>@board.UserId</td>
-                        <th>No</th>
-                        <td>@board.Id</td>
-                    </tr>
-                    <tr>
-                        <th style="padding-bottom: 15px;">글제목</th>
-                        <th>등록일</th>
-                        <td>@board.Regdate</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input type="text" name="title" value="[Re]&nbsp;"
-                                   class="form-control" aria-describedby="basic-addon1">
-                        </td>
-                    </tr>
-
-                    <tbody>
-                        <tr>
-                            <td colspan="2">
-                                <textarea class="form-control" rows="10" name="content" placeholder="글을 적어 주세요."></textarea>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th style="padding-top: 15px">첨부파일</th>
-                            <td><input type="file" class="btn btn-default" name="fileName" accept='image/*'></td>
-                        </tr>
-                    </tbody>
-                </table>*@
         </div>
     </div>
+
+
     <!--/////////////////////////////////////////////////////////////-->
     <!-- Reply -->
     <!--/////////////////////////////////////////////////////////////-->
 
 
-
     <hr />
-    <input class="txt_Reply" placeholder="댓글을 입력해주세요." />
 
-    <input type="button" class="btn btn-success" id="btn_ReplySave" value="저장" />
-    @*<input type="file" class="btn btn-default" name="fileName" accept='image/*'>*@
+    @*<form action="ReplyUpdate" method="post" enctype="multipart/form-data">
+            <input class="txt_Reply" placeholder="댓글을 입력해주세요." />
+            <input type="file" name="file" id="file" accept='image/*' />
+            <input type="button" class="btn btn-primary" id="btn_ReplySave" value="저장" />
+            <input type="submit" value="Upload" class="btn btn-primary" />
+        </form>*@
+
+    <br />
 
     <!-- 이미지 파일만 업로드 test1 -->
-    <input type="file" id="file" accept='image/*'>
-    <img src="" id="image" height="100">
-    <script>
-        $("#file").on("change", function (e) {
-            var tmp = e.target.files[0];
-            var img = URL.createObjectURL(tmp);
-            $("#image").attr("src", img);
-        });
-    </script>
+    @*<input type="file" id="file" accept='image/*'>
+        <img src="" id="image" height="100">
+        <script>
+            $("#file").on("change", function (e) {
+                var tmp = e.target.files[0];
+                var img = URL.createObjectURL(tmp);
+                $("#image").attr("src", img);
+            });
+        </script>*@
 
-    <!--<form action="ReplyUpdate" method="post" enctype="multipart/form-data">
-        <hr />
-        <input type="file" name="file" id="file" accept='image/*' />
-        <br />-->
-    @* <input type="submit" value="Upload" class="btn btn-primary" />*@
-    <!--</form>-->
     <!-- 이미지 파일 업로드 test2 -->
     @*<input type="file" id="file" accept='image/*' />
         <img src="" id="image" height="100" />
@@ -175,6 +104,7 @@
             function setImageFromFile(image) {
                 var reader = new FileReader();
                 reader.onload = function (e) {
+                    console.log(reader.result);
                     $(image).attr('src', e.target.result);
                 }
                 reader.readAsDataURL(file);
@@ -189,31 +119,112 @@
         }*@
 
     <!-- 이미지 파일 업로드 test6 -->
-    <!--<form action="UploadFile" method="post" enctype="multipart/form-data">
-        <input type="file" name="file" id="file" accept='image/*' />
-        <input type="submit" value="업로드" class="submit" />-->
-    @*        <img src="" id="image" height="100">
+    @*<form action="ReplyUpdate" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" id="file" accept='image/*' />
+            <input type="submit" value="업로드" class="submit" />
+                <img src="" id="image" height="100">
+            <script>
+                $("#file").on("change", function (e) {
+                    var tmp = e.target.files[0];
+                    var img = URL.createObjectURL(tmp);
+                    $("#image").attr("src", img);
+                });
+            </script>
+        </form>*@
+
+    <!-- 이미지 파일 업로드 test7 -->
+    <!-- .readAsDataURL()를 이용하여 바이너리 파일을 읽어 들일 때 사용 (1) -->
+    @*<input type='file' id="file" accept='image/*' onchange='Reader(event)'><br>
+        <img id='image' >
         <script>
-            $("#file").on("change", function (e) {
-                var tmp = e.target.files[0];
-                var img = URL.createObjectURL(tmp);
-                $("#image").attr("src", img);
-            });
+            var Reader = function (event) {
+                var data = event.target;
+                var reader = new FileReader();
+                reader.onload = function () {
+                    var dataURL = reader.result;
+                    var image = document.getElementById('image');
+                    image.src = dataURL;
+                };
+                reader.readAsDataURL(data.files[0]);
+            };
         </script>*@
-    <!--</form>-->
+
+    <form action="" method="post" enctype="multipart/form-data">
+        <input type="text" class="txt_Reply" placeholder="댓글을 입력해주세요." />
+        <input type="submit" class="btn btn-primary" id="btn_ReplySave" value="저장" />
+        <input type="file" name="file" id="file" accept='image/*' />
+        @*<input type="submit" value="Upload" class="btn btn-primary" />*@
+    </form>
 
     <br />
     <br />
 
-    <!-- 댓글 리스트 -->
-    @*    <div class="reply-wrap">
-            <div class="reply-content">
-                <div class="reply-group">
-                </div>
-            </div>
-        </div>*@
+    <form method="post" enctype="multipart/form-data" id="fileUploadForm">
+        <input type="text" name="content" />
+        <input type="file" name="file" />
+        <input type="submit" value="Submit" id="btnSubmit" />
+    </form>
+
+    <h1>Ajax Post Result</h1>
+    <span id="result"></span>
+
+    <br />
 
     <!-- 댓글 리스트 -->
+    <div class="row">
+        <table class="table table-striped">
+            <tr>
+                <th>글내용</th>
+                <th>작성자</th>
+                <th>등록일</th>
+                <th></th>
+            </tr>
+            @foreach (var item in comment)
+            {
+                <tr>
+                    <td class="col-md-6">
+                        @for (int i = 0; i < @item.Lv; i++)
+                        {
+                            <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        }
+                        @if (item.Image != null)
+                        {
+                            <img src="@item.Image" height="100" />
+                            <br />
+                            <br />
+                        }
+                        @for (int i = 0; i < @item.Lv; i++)
+                        {
+                            <span>&nbsp;&nbsp;&nbsp;</span>
+                        }
+                        @item.Comment
+                    </td>
+                    <td>
+                        <a href="#" id="data_UserId" data-userid="@item.Id" data-id="@item.Id" onclick="return ReplyMention(@item.Id, '@item.UserId')">
+                            @item.UserId
+                        </a>
+                    </td>
+                    <td>
+                        @item.Regdate
+                    </td>
+                    <td>
+                        @if (@Session["UserId"].ToString() == @item.UserId)
+                        {
+                            <button type="button" class="btn btn-primary" id="data_Reply" data-id="@item.Id" onclick="return EditComment(@item.Id, '@item.Comment')">
+                                <span class="glyphicon glyphicon-pencil"></span>수정
+                            </button>
+                            <button type="button" class="btn btn-default" onclick="return DeleteReply(@item.Id)">
+                                <span class="glyphicon glyphicon-remove"></span>삭제
+                            </button>
+                        }
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+
+    <hr />
+
     @foreach (var item in comment)
     {
         <div class="reply-wrap">
@@ -259,6 +270,7 @@
             </div>
         </div>
     }
+
 
     <script>
         @*$(document).ready(function () {
@@ -335,20 +347,21 @@
         /* "저장" 버튼 클릭시 댓글 Insert or Update */
         $("#btn_ReplySave").click(function () {
             var data = {
-                //Id: $(".txt_Reply").data("Id") == '0' ? '0' : $(".txt_Reply").data("Id"),
                 Id: $(".txt_Reply").data("Id") == undefined ? 0 : $(".txt_Reply").data("Id"),
                 ParentId: $(".txt_Reply").data("Id") == undefined ? undefined : $(".txt_Reply").data("Id"),
                 TopId: $(".txt_Reply").data("Id"),
                 Lv: $(".txt_Reply").data("id") == undefined ? 1 : $("txt_Reply").data("Id"),
                 Comment: $(".txt_Reply").val(),
-                Image: $("#file").val() == "" ? undefined : $("#file").val()
-            }
+                //Image: new FormData($('form')[0])
+                //Image: $("#file").val() == "" ? undefined : $("#file").val()
+            };
+            //var formData = new FormData($('form')[0]);
             $.ajax({
                 type: "POST",
                 url: "/Board/ReplyUpdate",
+                //data: data, formData,
                 data: data,
                 success: function () {
-                    //if ($(".txt_Reply").data("Id") == undefined) {
                     if ($(".txt_Reply").data("Id") == undefined) {
                         alert("신규 저장 완료");
                     } else if ($(".txt_Reply").data("UserId") != undefined) {
@@ -360,6 +373,34 @@
                     //getReplyList();
                 }
             })
+        });
+
+        $("#btnSubmit").click(function (event) {
+            event.preventDefault();
+            var form = $("#fileUploadForm")[0];
+            var data = new FormData(form);
+            data.append("CustomField", "This is some extra data, testing");
+            $("btnSubmit").prop("disabled", true);
+            $.ajax({
+                type: "POST",
+                enctype: "multipart/form-data",
+                url: "/Board/ReplyUpdate",
+                data: data,
+                processData: false,
+                contentType: false,
+                cache: false,
+                timeout: 600000,
+                success: function (data) {
+                    $("#result").text(data);
+                    console.log("SUCCESS : ", data);
+                    $("#btnSubmit").prop("disabled", false);
+                },
+                error: function (e) {
+                    $("#result").text(e.responseText);
+                    console.log("ERROR: ", e);
+                    $("#btnSubmit").prop("disabled", false);
+                }
+            });
         });
 
         /* 댓글 Delete */
@@ -376,18 +417,19 @@
             })
         };
 
-        /* 이미지 파일 주소 불러오기 */
-        function readURL(input) {
+        /* 이미지 파일 주소 불러오기 test4 */
+        @*function readURL(input) {
             if (input.files && input.files[0]) {
-                var reader = new FileReader(); //파일을 읽기 위한 FileReader 객체 생성
+                //파일을 읽기 위한 FileReader 객체 생성
+                var reader = new FileReader();
+                //파일 읽기를 성공(onload)했을때 호출되는 이벤트 핸들러
                 reader.onload = function (e) {
-                    //파일 읽기를 성공했을때 호출되는 이벤트 핸들러
-                    $("#file").attr('src', e.target.result);
                     //이미지 Tag의 src속성에 읽어들인 File 내용을 지정
+                    $("#file").attr('src', e.target.result);
                 }
-                reader.readAsDataURL(input.files[0]);
                 //File 내용을 읽어 dataURL 형식의 문자열로 저장
+                reader.readAsDataURL(input.files[0]);
             }
-        }
+        } *@
     </script>
 </div>

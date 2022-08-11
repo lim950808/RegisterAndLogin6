@@ -1,5 +1,6 @@
 ﻿@{
     ViewBag.Title = "UploadFile";
+    List<RegisterAndLogin6.Models.SPA.CommentList> upload = ViewBag.upload as List<RegisterAndLogin6.Models.SPA.CommentList>;
 }
 
 <h2>UploadFile</h2>
@@ -20,6 +21,61 @@
     <input type="submit" value="Upload" class="btn btn-primary" />
     @ViewBag.Message
 </form>
+
+<form action="" method="post" enctype="multipart/form-data">
+    <input type="text" id="txtId" name="id" />
+    <input type="text" class="txt_Reply" placeholder="댓글을 입력해주세요." />
+    <input type="file" name="file" id="file" />
+    <input type="submit" />
+</form>
+
+<br />
+<br />
+<br />
+
+@*<div class="card my-4">
+        <h5 class="card-header">Leave a Comment:</h5>
+        <div class="card-body">
+            <form name="comment-form" action="/Upload/getCommentList" method="post" autocomplete="off">
+                <div class="form-group">
+                    <input type="hidden" name="idx" class="txt_Reply" />
+                    <textarea name="content" class="form-control" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>*@
+
+@*<script>
+        $(document).ready(function () {
+            getCommentList();
+        })
+
+        function getCommentList() {
+            var data = {
+                Comment: $("#txt_Reply").val();
+            }
+            $.ajax({
+                type: "GET",
+                url: "/Upload/getCommentList",
+                data: data ,
+                success: function (result) {
+                    console.log(result);
+                    for (var i = 0; i < result.length; i++) {
+                        var str = "<div class=\"comment\">"
+                        str += result[i].content + "</div></hr>"
+                        $("#comment").append(str);
+                    }
+                },
+                error: function (result) {
+
+                },
+                complete: function () {
+
+                }
+            })
+        }
+    </script>*@
 
 @*<input type="file" name="file" id="file" accept='image/*' />
     <br />
@@ -42,3 +98,90 @@
         })
     });
 </script>-->
+@*@foreach (var item in upload)
+    {
+        <div id="modify">
+            <strong>작성자: @item.UserId</strong>
+            <span>&nbsp; &nbsp; &nbsp; &nbsp;</span>
+            작성날짜: @item.Regdate
+            <br />
+            <p>
+                댓글내용 : &nbsp;&nbsp;&nbsp;
+                <textarea class="form-control" id="comment">@item.Comment</textarea>
+            </p>
+            <br />
+            <button type="button" class="btn btn-outline-success" onclick="updateBtn(@item.Id, @item.UserId)">댓글작성</button>
+            <button type="button" class="btn btn-outline-success" onclick="getReplyList()">취소</button>
+        </div>
+    }
+
+    <script>
+        function updateBtn(Id, UserId) {
+            var updateUrl = "/Upload/replyUpdate";
+            var reply_content = $("#reply_edit_content").val();
+            $.ajax({
+                url: updateUrl + Id + "/" + reply_content,
+                type: "POST",
+                dataType: "json",
+                success: function (result) {
+                    getReplyList();
+                },
+                error: function (error) {
+                    console.log("에러: " + error);
+                }
+            });
+        };
+    </script>*@
+
+
+<!DOCTYPE html>
+<html>
+<body>
+
+    <h1>jQuery Ajax submit Multipart form</h1>
+
+    <form method="POST" enctype="multipart/form-data" id="fileUploadForm">
+        <input type="text" name="extraField" /><br /><br />
+        <input type="file" name="files" /><br /><br />
+        <input type="submit" value="Submit" id="btnSubmit" />
+    </form>
+
+    <h1>Ajax Post Result</h1>
+    <span id="result"></span>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#btnSubmit").click(function (event) {
+                event.preventDefault();
+                var form = $("#fileUploadForm")[0];
+                var data = new FormData(form);
+                data.append("CustomField", "This is some extra data, testing");
+                $("btnSubmit").prop("disabled", true);
+                $.ajax({
+                    type: "POST",
+                    enctype: "multipart/form-data",
+                    url: "/Upload/UploadFile1",
+                    data: data,
+                    processData: false,
+                    contentType: false,
+                    cache: false,
+                    timeout: 600000,
+                    success: function (data) {
+                        $("#result").text(data);
+                        console.log("SUCCESS : ", data);
+                        $("#btnSubmit").prop("disabled", false);
+                    },
+                    error: function (e) {
+                        $("#result").text(e.responseText);
+                        console.log("ERROR: ", e);
+                        $("#btnSubmit").prop("disabled", false);
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
