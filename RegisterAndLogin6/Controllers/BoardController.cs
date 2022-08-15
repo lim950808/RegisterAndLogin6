@@ -273,6 +273,57 @@ namespace RegisterAndLogin6.Controllers
             }
         }
 
+        [HttpPost]
+        public ActionResult ReplyUpdate2(string Comment, HttpPostedFileBase file)
+        {
+            using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
+            {
+                string fileName = Path.GetFileName(file.FileName);
+                string _path = Path.Combine(Server.MapPath("~/UploadedFiles"), fileName);
+                file.SaveAs(_path);
+                string filePath = @"https:\\localhost:44329\image\" + fileName;
+
+                object param2 = new { Comment = Comment, Image = filePath };
+                string sql = "INSERT INTO CommentList (Comment, Image) VALUES (" + Comment + "," + filePath + ")";
+                return Json(db.Query<Models.SPA.CommentList>(sql, param2));
+            }
+        }
+
+        [HttpPost]
+        public ActionResult UploadFiles(string Comment)
+        {
+            using (var db = new System.Data.SqlClient.SqlConnection(DbConnection))
+            {
+                /*                if (Request.Files.Count > 0)
+                                {
+                                    try
+                                    {*/
+                HttpFileCollectionBase files = Request.Files;
+                for (int i = 0; i < files.Count; i++)
+                {
+                    HttpPostedFileBase file = files[i];
+                    string fname = file.FileName;
+                    string fpath = Path.Combine(Server.MapPath("~/UploadedFiles"), fname);
+                    file.SaveAs(fpath);
+                    string filePath = @"https:\\localhost:44329\image\" + fname;
+                    db.Query<Models.SPA.CommentList>("sp_SPA_CommentList_UploadFiles", new { Image = filePath, Comment = Comment }, null, true, null, System.Data.CommandType.StoredProcedure);
+                }
+                return Json("File Uploaded Successfully!");
+                /*                    }
+                                    catch (Exception ex)
+                                    {
+                                        return Json("Error occurred. Error details: " + ex.Message);
+                                    }
+                                }
+                                else
+                                {
+                                    return Json("No files selected.");
+                                }*/
+            }
+
+
+        }
+
         /* 댓글 ReplyDelete */
         public JsonResult ReplyDelete(int Id)
         {

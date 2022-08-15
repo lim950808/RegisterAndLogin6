@@ -160,7 +160,7 @@
     <br />
 
     <form method="post" enctype="multipart/form-data" id="fileUploadForm">
-        <input type="text" name="content" />
+        <input type="text" id="txt_Reply2" name="content" />
         <input type="file" name="file" />
         <input type="submit" value="Submit" id="btnSubmit" />
     </form>
@@ -353,7 +353,7 @@
                 Lv: $(".txt_Reply").data("id") == undefined ? 1 : $("txt_Reply").data("Id"),
                 Comment: $(".txt_Reply").val(),
                 //Image: new FormData($('form')[0])
-                //Image: $("#file").val() == "" ? undefined : $("#file").val()
+                Image: $("#file").val() == "" ? undefined : $("#file").val()
             };
             //var formData = new FormData($('form')[0]);
             $.ajax({
@@ -385,7 +385,10 @@
                 type: "POST",
                 enctype: "multipart/form-data",
                 url: "/Board/ReplyUpdate",
-                data: data,
+                data: {
+                    Comment: $(".txt_Reply2").val(),
+                    Image: data
+                },
                 processData: false,
                 contentType: false,
                 cache: false,
@@ -433,3 +436,38 @@
         } *@
     </script>
 </div>
+
+
+<input type="text" class="txt_CommentUpload" />
+<input type="file" id="FileUpload1" />
+<input type="button" id="btnUpload" value="Upload Files" />
+<script>
+    $("#btnUpload").click(function () {
+        var fileUpload = $("#FileUpload1").get(0);
+        var files = fileUpload.files;
+        var fileData = new FormData();
+        for (var i = 0; i < files.length; i++) {
+            fileData.append(files[i].name, files[i]);
+        }
+        var data = {
+            Comment: $(".txt_CommentUpload").val()
+        }
+        var CommentData = $(".txt_CommentUpload").val();
+        $.ajax({
+            url: "/Board/UploadFiles",
+            type: "POST",
+            contentType: false,
+            processData: false,
+            //data: fileData,
+            data: data,
+            success: function (result) {
+                alert(result);
+                alert("저장완료");
+                window.location.reload();
+            },
+            error: function (err) {
+                alert(err.statusText);
+            }
+        });
+    });
+</script>

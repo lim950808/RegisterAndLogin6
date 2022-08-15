@@ -19,6 +19,7 @@ namespace RegisterAndLogin6.Models.SPA
 
         public string Comment { get; set; } //게시글
 
+        //public HttpPostedFileBase[] Image { get; set; } //사진
         public string Image { get; set; } //사진
 
         public DateTime Regdate { get; set; } //등록일자

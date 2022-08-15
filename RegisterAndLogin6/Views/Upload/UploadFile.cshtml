@@ -29,6 +29,32 @@
     <input type="submit" />
 </form>
 
+<input type="file" id="FileUpload1" />
+<input type="button" id="btnUpload" value="Upload Files" />
+<script>
+    $("#btnUpload").click(function () {
+        var fileUpload = $("#FileUpload1").get(0);
+        var files = fileUpload.files;
+        var fileData = new FormData();
+        for (var i = 0; i < files.length; i++) {
+            fileData.append(files[i].name, files[i]);
+        }
+        $.ajax({
+            url: "/Board/UploadFiles",
+            type: "POST",
+            contentType: false,
+            processData: false,
+            data: fileData,
+            success: function (result) {
+                alert(result);
+            },
+            error: function (err) {
+                alert(err.statusText);
+            }
+        });
+    });
+</script>
+
 <br />
 <br />
 <br />
