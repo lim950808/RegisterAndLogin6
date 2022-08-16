@@ -123,8 +123,7 @@ Create Procedure [dbo].[sp_SPA_CommentList_Insert] <br>
 	 @Lv		int,<br>
 	 @UserId	nvarchar(50),<br>
 	 @Comment	nvarchar(500),<br>
-	 @Image		nvarchar(500),<br>
-	 @Regdate	datetime<br>
+	 @Image		nvarchar(500)<br>
 	)<br>
 as     <br>
 Begin    <br>
@@ -139,8 +138,7 @@ Create Procedure [dbo].[sp_SPA_CommentList_Update] <br>
 	(<br>
 	 @Id		int,<br>
 	 @Comment	nvarchar(500),<br>
-	 @Image		nvarchar(500),<br>
-	 @Regdate	datetime<br>
+	 @Image		nvarchar(500)<br>
 	)<br>
 as     <br>
 Begin    <br>
