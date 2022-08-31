@@ -1,5 +1,5 @@
 # RegisterAndLogin6
-ASP.NET MVC 5 Board with Dapper
+ASP.NET MVC 5 Board with Dapper and Stored Procedures
 <pre>
 
 </pre>
